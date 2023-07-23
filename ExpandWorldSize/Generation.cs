@@ -16,7 +16,7 @@ public class Generate
   public static bool Generating => WorldGeneration.Generating || MapGeneration.Generating;
   public static void World()
   {
-    ExpandWorld.RefreshSize();
+    EWD.RefreshSize();
     GetBaseHeight.Refresh();
     var wg = WorldGenerator.instance;
     if (wg != null && !wg.m_world.m_menu)

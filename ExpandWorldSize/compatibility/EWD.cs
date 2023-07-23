@@ -4,20 +4,20 @@ using HarmonyLib;
 
 namespace ExpandWorldSize;
 
-public class ExpandWorld
+public class EWD
 {
-  public const string GUID = "expand_world";
-  private static Assembly? ExpandWorldAssembly;
+  public const string GUID = "expand_world_data";
+  private static Assembly? Assembly;
   private static MethodInfo? SetSize;
   public static void Run()
   {
     if (!Chainloader.PluginInfos.TryGetValue(GUID, out var info)) return;
-    ExpandWorldAssembly = info.Instance.GetType().Assembly;
-    var type = ExpandWorldAssembly.GetType("ExpandWorld.World");
+    Assembly = info.Instance.GetType().Assembly;
+    var type = Assembly.GetType("ExpandWorldData.World");
     if (type == null) return;
     SetSize = AccessTools.Method(type, "Set");
     if (SetSize == null) return;
-    EWS.Log.LogInfo("\"Expand World\" detected. Applying compatibility.");
+    EWS.Log.LogInfo("\"Expand World Data\" detected. Applying compatibility.");
   }
 
   public static void RefreshSize()

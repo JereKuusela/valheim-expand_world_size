@@ -4,10 +4,10 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using Service;
-using UnityEngine;
 
 namespace ExpandWorldSize;
 [BepInPlugin(GUID, NAME, VERSION)]
+[BepInIncompatibility("expand_world")]
 public class EWS : BaseUnityPlugin
 {
   public const string GUID = "expand_world_size";
@@ -24,11 +24,14 @@ public class EWS : BaseUnityPlugin
     IsLocked = true
   };
   public static string ConfigName = $"{GUID}.cfg";
+  public static bool NeedsMigration = File.Exists(Path.Combine(Paths.ConfigPath, "expand_world.cfg")) && !File.Exists(Path.Combine(Paths.ConfigPath, ConfigName));
   public void Awake()
   {
     Log = Logger;
     ConfigWrapper wrapper = new(Config, ConfigSync, InvokeRegenerate);
     Configuration.Init(wrapper);
+    if (NeedsMigration)
+      MigrateOldConfig();
     Harmony harmony = new(GUID);
     harmony.PatchAll();
     try
@@ -49,7 +52,26 @@ public class EWS : BaseUnityPlugin
   {
     Marketplace.Run();
     BetterContinents.Run();
-    ExpandWorld.Run();
+    EWD.Run();
+  }
+  private void MigrateOldConfig()
+  {
+    Log.LogWarning("Migrating old config file.");
+    Config.Save();
+    var from = File.ReadAllLines(Path.Combine(Paths.ConfigPath, "expand_world.cfg"));
+    var to = File.ReadAllLines(Path.Combine(Paths.ConfigPath, ConfigName));
+    foreach (var line in from)
+    {
+      var split = line.Split('=');
+      if (split.Length != 2) continue;
+      for (var i = 0; i < to.Length; i++)
+      {
+        if (to[i].StartsWith(split[0]))
+          to[i] = line;
+      }
+    }
+    File.WriteAllLines(Path.Combine(Paths.ConfigPath, ConfigName), to);
+    Config.Reload();
   }
   public void InvokeRegenerate()
   {

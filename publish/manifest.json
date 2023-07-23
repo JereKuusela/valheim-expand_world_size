@@ -1,8 +1,8 @@
 {
-  "name": "Expand_World",
-  "version_number": "1.52.0",
-  "website_url": "https://github.com/JereKuusela/valheim-expand_world",
-  "description": "This mod allows adding new biomes and changing most of the world generation.",
+  "name": "Expand_World_Size",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/JereKuusela/valheim-expand_world_size",
+  "description": "Allows configuring the world size and altitude settings.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2105"
   ]

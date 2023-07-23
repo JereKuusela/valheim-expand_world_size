@@ -7,10 +7,8 @@ public class World
 
   public static float WaterLevel = 30;
 
-  public static void Set(float waterLevel)
+  public static void SetWaterLevel(float waterLevel)
   {
-    if (waterLevel == WaterLevel) return;
     WaterLevel = waterLevel;
-    Generate.World();
   }
 }

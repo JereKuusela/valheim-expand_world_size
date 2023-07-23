@@ -11,7 +11,7 @@ public class ConfigWrapper
 
   private readonly ConfigFile ConfigFile;
   private readonly ConfigSync ConfigSync;
-  private readonly Action Regenerate;
+  public readonly Action Regenerate;
   public ConfigWrapper(ConfigFile configFile, ConfigSync configSync, Action regenerate)
   {
     ConfigFile = configFile;
