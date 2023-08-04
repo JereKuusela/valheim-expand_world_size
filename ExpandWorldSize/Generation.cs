@@ -16,11 +16,11 @@ public class Generate
   public static bool Generating => WorldGeneration.Generating || MapGeneration.Generating;
   public static void World()
   {
-    EWD.RefreshSize();
-    GetBaseHeight.Refresh();
     var wg = WorldGenerator.instance;
-    if (wg != null && !wg.m_world.m_menu)
+    if (wg != null && !wg.m_world.m_menu) {
+      GetBaseHeight.Refresh(wg);
       Game.instance.StartCoroutine(WorldGeneration.Coroutine(wg));
+    }
   }
   public static void Cancel()
   {

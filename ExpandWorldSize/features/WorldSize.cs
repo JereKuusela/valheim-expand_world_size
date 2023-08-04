@@ -42,17 +42,50 @@ public class GetForestFactor
       __result /= multiplier;
   }
 }
+
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.VersionSetup))]
+public class VersionSetup
+{
+  // Different value depending on world version so must track it.
+  public static float MaxMarshDistance = 6000f;
+  static void Prefix(WorldGenerator __instance) {
+    __instance.maxMarshDistance = 6000f;
+  } 
+  static void Postfix(WorldGenerator __instance) {
+    MaxMarshDistance = __instance.maxMarshDistance;
+    GetBaseHeight.Refresh(__instance);
+  } 
+
+}
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBaseHeight))]
 public class GetBaseHeight
 {
-  private static float Radius10000 = 10000f;
-  private static float Radius10500 = 10500f;
-  private static float Radius10490 = 10490f;
-  public static void Refresh()
+  public static float Radius10000 = 10000f;
+  public static float Radius10500 = 10500f;
+  public static float Radius10490 = 10490f;
+  public static float Radius600 = 600f;
+  public static float Radius2000 = 2000f;
+  public static float Radius3000 = 3000f;
+  public static float Radius4000 = 4000f;
+  public static float Radius5000 = 5000f;
+  public static float Radius6000 = 6000f;
+  public static float Radius8000 = 8000f;
+  public static float Radius12000 = 12000f;
+  public static void Refresh(WorldGenerator obj)
   {
     Radius10000 = Configuration.WorldRadius / Configuration.WorldStretch;
+    Radius600 = 0.06f * Radius10000;
+    Radius2000 = 0.2f * Radius10000;
+    Radius3000 = 0.3f * Radius10000;
+    Radius4000 = 0.4f * Radius10000;
+    Radius5000 = 0.5f * Radius10000;
+    Radius6000 = 0.6f * Radius10000;
+    Radius8000 = 0.8f * Radius10000;
+    Radius12000 = 1.2f * Radius10000;
     Radius10500 = Configuration.WorldTotalRadius / Configuration.WorldStretch;
     Radius10490 = (Configuration.WorldTotalRadius - 10f) / Configuration.WorldStretch;
+    obj.maxMarshDistance = VersionSetup.MaxMarshDistance * Radius10000 / 10000f;
+    EWD.RefreshSize();
   }
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {

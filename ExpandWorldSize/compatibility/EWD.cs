@@ -23,6 +23,6 @@ public class EWD
   public static void RefreshSize()
   {
     if (SetSize == null) return;
-    SetSize.Invoke(null, new object[] { World.WaterLevel, Configuration.WorldRadius, Configuration.WorldTotalRadius, Configuration.WorldStretch, Configuration.BiomeStretch });
+    SetSize.Invoke(null, new object[] { Configuration.WorldRadius, Configuration.WorldTotalRadius, Configuration.WorldStretch, Configuration.BiomeStretch });
   }
 }
