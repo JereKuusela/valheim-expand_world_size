@@ -41,13 +41,13 @@ public class Minimap_ShowLoading
       CleanUp(__instance.m_biomeNameLarge, PreviousLargeText);
       PreviousLargeText = "";
     }
-    if (mode == Minimap.MapMode.Small && Generate.Generating)
+    if (mode == Minimap.MapMode.Small && MapGeneration.Generating)
     {
       var text = GetText();
       AddText(__instance.m_biomeNameSmall, text);
       PreviousSmallText = text;
     }
-    if (mode == Minimap.MapMode.Large && Generate.Generating)
+    if (mode == Minimap.MapMode.Large && MapGeneration.Generating)
     {
       var text = GetText();
       AddText(__instance.m_biomeNameLarge, text);

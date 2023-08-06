@@ -1,3 +1,8 @@
+- v1.2
+  - Optimizes multiplayer data sync.
+  - Removes world generation as a background task. Minimap is still generated as a background task.
+  - Removes minimap generation from the dedicated server.
+
 - v1.1
   - Fixes error with Expand World Data mod.
   - Fixes biome distribution not working with increased world size.

@@ -12,7 +12,7 @@ public class EWS : BaseUnityPlugin
 {
   public const string GUID = "expand_world_size";
   public const string NAME = "Expand World Size";
-  public const string VERSION = "1.1";
+  public const string VERSION = "1.2";
 #nullable disable
   public static ManualLogSource Log;
 #nullable enable
@@ -42,11 +42,6 @@ public class EWS : BaseUnityPlugin
     {
       Log.LogError(e);
     }
-    CancelRegenerate = () =>
-    {
-      Generate.Cancel();
-      CancelInvoke("Regenerate");
-    };
   }
   public void Start()
   {
@@ -75,11 +70,12 @@ public class EWS : BaseUnityPlugin
   }
   public void InvokeRegenerate()
   {
+    // Nothing to regenerate because the world hasn't been generated yet.
+    if (WorldGenerator.instance == null) return;
     // Debounced for smooth config editing.
     CancelInvoke("Regenerate");
     Invoke("Regenerate", 1.0f);
   }
-  public static Action CancelRegenerate = () => { };
   public void Regenerate() => Generate.World();
 #pragma warning disable IDE0051
   private void OnDestroy()

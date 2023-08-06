@@ -6,7 +6,7 @@ Always back up your world before making any changes!
 
 Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm2eKLrk)).
 
-# Configuration
+## Configuration
 
 Settings are automatically reloaded (consider using [Configuration manager](https://valheim.thunderstore.io/package/Azumatt/Official_BepInEx_ConfigurationManager/)). This can lead to weird behavior so it's recommended to make a fresh world after you are done configuring.
 
@@ -16,7 +16,7 @@ Note: Minimap is generated as a background task. This is indicated by a small `L
 
 Note: Old configuration from Expand World is automatically migrated to this mod.
 
-# World size
+## World size
 
 The size can be increased by changing the `World radius` and `World edge size` settings. The total size is sum of these (default is 10000 + 500 = 10500 meters). Usually there is no need to change the edge size.
 
@@ -33,12 +33,14 @@ Note: If the game fails to place the spawn altar (for example if no Meadows), th
 The minimap size must be manually changed because there are two different settings. Both of the settings increase the minimap size but have a different drawback. `Minimap size` significantly increases the minimap generation time while `Minimap pixel size` makes the minimap less detailed.
 
 Recommended settings:
+
 - 20000 radius: 2 size, 1 pixel.
 - 40000 radius: 2 size, 2 pixel.
 - 80000 radius: 4 size, 2 pixel.
 - 160000 radius: 4 size, 4 pixel.
 
 Example generation times:
+
 - Default: 15 seconds.
 - 2 size: 1 minute.
 - 4 size: 4 minutes.
@@ -47,7 +49,7 @@ Example generation times:
 
 Note: Changing `Minimap size` resets explored areas.
 
-# Altitude
+## Altitude
 
 For the altitude, there are two settings: `Altitude delta` and `Altitude multiplier`. The multiplier multiplies the distance to the water level (by default at 30 meters). So increasing the multiplier will make water more deeper and other terrain higher. The delta directly affects the altitude. For example positive values will make the underwater terrain more shallow.
 
@@ -59,9 +61,9 @@ Note: Altitude based snow is hard coded and can't be changed.
 
 The final water depth can be multiplied with `Water depth multiplier`.
 
-Amount of forest can be changed with `Forest multiplier`. 
+Amount of forest can be changed with `Forest multiplier`.
 
-# Seeds
+## Seeds
 
 The layout of the world is [pre-determined](https://www.reddit.com/r/valheim/comments/qere7a/the_world_map/), and each world is just a snapshot of it.
 

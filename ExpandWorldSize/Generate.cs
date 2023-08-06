@@ -1,137 +1,51 @@
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace ExpandWorldSize;
 
 public class Generate
 {
-  public static int LastTaskIndex = 0;
-  public static bool Generating => WorldGeneration.Generating || MapGeneration.Generating;
   public static void World()
   {
-    var wg = WorldGenerator.instance;
-    if (wg != null && !wg.m_world.m_menu) {
-      GetBaseHeight.Refresh(wg);
-      Game.instance.StartCoroutine(WorldGeneration.Coroutine(wg));
-    }
-  }
-  public static void Cancel()
-  {
-    WorldGeneration.Cancel();
+    if (WorldGenerator.instance == null) return;
+    EWS.Log.LogInfo("Regenerating the world.");
+    GetBaseHeight.Refresh(WorldGenerator.instance);
     MapGeneration.Cancel();
-  }
-}
-
-
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocations), new Type[0])]
-public class LocationGeneration
-{
-  static void Prefix()
-  {
-    if (WorldGeneration.HasLoaded) return;
-    WorldGeneration.GenerateSync(WorldGenerator.instance);
-    // This is called at ZNet.Start before Minimap.Start.
-    // So doing Minimap.instance.GenerateWorldMap() is pointless and may even cause issues with other mods.
-  }
-}
-
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Pregenerate))]
-public class WorldGeneration
-{
-  public static void GenerateSync(WorldGenerator wg)
-  {
-    EWS.CancelRegenerate();
-    EWS.Log.LogInfo("Started world generation.");
-    var stopwatch = Stopwatch.StartNew();
-    wg.m_riverPoints.Clear();
-    wg.m_cachedRiverGrid = new Vector2i(-999999, -999999);
-    wg.m_cachedRiverPoints = null;
-    wg.FindLakes();
-    wg.m_rivers = wg.PlaceRivers();
-    wg.m_streams = wg.PlaceStreams();
-    EWS.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds:F0} seconds).");
-    stopwatch.Stop();
-    HasLoaded = true;
-  }
-  public static bool HasLoaded = false;
-  static bool Prefix(WorldGenerator __instance)
-  {
-    if (__instance.m_world.m_menu) return true;
-    if (HasLoaded)
-      Game.instance.StartCoroutine(Coroutine(__instance));
-    else
-      GenerateSync(__instance);
-    return false;
-  }
-  public static void Cancel()
-  {
-    if (CTS != null)
-    {
-      EWS.Log.LogInfo("Cancelling previous world generation.");
-      CTS.Cancel();
-      CTS = null;
-    }
-  }
-  public static bool Generating => CTS != null;
-  static CancellationTokenSource? CTS = null;
-  public static IEnumerator Coroutine(WorldGenerator wg)
-  {
-    Cancel();
-    MapGeneration.Cancel();
-
-    EWS.Log.LogInfo($"Started world generation.");
-    var stopwatch = Stopwatch.StartNew();
-
-    CancellationTokenSource cts = new();
-    var ct = cts.Token;
-
-    CTS = cts;
-    wg.m_riverPoints.Clear();
-    wg.m_cachedRiverGrid = new Vector2i(-999999, -999999);
-    wg.m_cachedRiverPoints = null;
-    wg.FindLakes();
-    if (ct.IsCancellationRequested)
-      yield break;
-    yield return null;
-    wg.m_rivers = wg.PlaceRivers();
-    if (ct.IsCancellationRequested)
-      yield break;
-    yield return null;
-    wg.m_streams = wg.PlaceStreams();
-    if (ct.IsCancellationRequested)
-      yield break;
-    yield return null;
-    foreach (var heightmap in UnityEngine.Object.FindObjectsOfType<Heightmap>())
+    WorldGenerator.instance.Pregenerate();
+    foreach (var heightmap in Object.FindObjectsOfType<Heightmap>())
     {
       heightmap.m_buildData = null;
       heightmap.Regenerate();
     }
-    if (ct.IsCancellationRequested)
-      yield break;
-    yield return null;
-    if (ClutterSystem.instance)
-      ClutterSystem.instance.ClearAll();
+    ClutterSystem.instance?.ClearAll();
     SetupMaterial.Refresh();
     WaterLayerFix.Refresh(EnvMan.instance);
-    if (ct.IsCancellationRequested)
-      yield break;
-    yield return null;
-    HasLoaded = true;
-    EWS.Log.LogInfo($"Finished world generation ({stopwatch.Elapsed.TotalSeconds:F0} seconds).");
-    stopwatch.Stop();
-    cts.Dispose();
+    if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
+      Minimap.instance?.GenerateWorldMap();
+  }
+}
 
-    if (CTS == cts)
-      CTS = null;
-    if (Minimap.instance && ZNet.instance && !ZNet.instance.IsDedicated())
-      Minimap.instance.GenerateWorldMap();
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Pregenerate)), HarmonyPriority(Priority.HigherThanNormal)]
+public class Pregenerate
+{
+  static void Prefix(WorldGenerator __instance)
+  {
+    // River points must at least be cleaned.
+    // But better clean up everything.
+    __instance.m_riverCacheLock.EnterWriteLock();
+    __instance.m_riverPoints = new();
+    __instance.m_rivers = new();
+    __instance.m_streams = new();
+    __instance.m_lakes = new();
+    __instance.m_cachedRiverGrid = new Vector2i(-999999, -999999);
+    __instance.m_cachedRiverPoints = new WorldGenerator.RiverPoint[0];
+    __instance.m_riverCacheLock.ExitWriteLock();
   }
 }
 
@@ -144,6 +58,7 @@ public class MapGeneration
   static bool DoFakeGenerate = false;
   static bool Prefix(Minimap __instance)
   {
+    if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) return true;
     if (DoFakeGenerate)
     {
       DoFakeGenerate = false;
@@ -154,7 +69,6 @@ public class MapGeneration
       EWS.Log.LogInfo($"Better Contintents enabled, skipping map generation.");
       return true;
     }
-    if (!WorldGeneration.HasLoaded || WorldGeneration.Generating) return false;
     Game.instance.StartCoroutine(Coroutine(__instance));
     return false;
   }
@@ -294,17 +208,11 @@ public class MapGeneration
   }
 }
 
-[HarmonyPatch(typeof(Game), nameof(Game.FindSpawnPoint))]
-public class FindSpawnPoint
-{
-  static bool Prefix() => WorldGeneration.HasLoaded;
-}
 [HarmonyPatch(typeof(Game), nameof(Game.Logout))]
 public class CancelOnLogout
 {
   static void Prefix()
   {
-    EWS.CancelRegenerate();
-    WorldGeneration.HasLoaded = false;
+    MapGeneration.Cancel();
   }
 }
