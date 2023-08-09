@@ -5,6 +5,7 @@ namespace ExpandWorldSize;
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) })]
 public class GetBiomeWG
 {
+  [HarmonyPriority(Priority.HigherThanNormal)]
   static void Prefix(WorldGenerator __instance, ref float wx, ref float wy)
   {
     if (__instance.m_world.m_menu) return;
@@ -32,8 +33,8 @@ public class GetBiomeWG
     matcher = Helper.Replace(matcher, 600f, () => GetBaseHeight.Radius600);
     matcher = Helper.Replace(matcher, 6000f, () => GetBaseHeight.Radius6000);
     matcher = Helper.Replace(matcher, 5000f, () => GetBaseHeight.Radius5000);
-    
-    
+
+
     return matcher.InstructionEnumeration();
   }
 }

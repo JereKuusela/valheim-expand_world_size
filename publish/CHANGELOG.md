@@ -1,3 +1,9 @@
+- v1.4
+  - Fixes world stretch not working with Expand World Data biome generation.
+
+- v1.3
+  - Fixes river generation not using map size for one side of the world.
+
 - v1.2
   - Optimizes multiplayer data sync.
   - Removes world generation as a background task. Minimap is still generated as a background task.
