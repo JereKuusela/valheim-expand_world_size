@@ -48,19 +48,22 @@ public class VersionSetup
 {
   // Different value depending on world version so must track it.
   public static float MaxMarshDistance = 6000f;
-  static void Prefix(WorldGenerator __instance) {
+  static void Prefix(WorldGenerator __instance)
+  {
     __instance.maxMarshDistance = 6000f;
-  } 
-  static void Postfix(WorldGenerator __instance) {
+  }
+  static void Postfix(WorldGenerator __instance)
+  {
     MaxMarshDistance = __instance.maxMarshDistance;
     GetBaseHeight.Refresh(__instance);
-  } 
+  }
 
 }
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBaseHeight))]
 public class GetBaseHeight
 {
   public static float Radius10000 = 10000f;
+  public static float Radius10000NoStretch = 10000f;
   public static float Radius10500 = 10500f;
   public static float Radius10490 = 10490f;
   public static float Radius600 = 600f;
@@ -74,6 +77,7 @@ public class GetBaseHeight
   public static void Refresh(WorldGenerator obj)
   {
     Radius10000 = Configuration.WorldRadius / Configuration.WorldStretch;
+    Radius10000NoStretch = Configuration.WorldRadius;
     Radius600 = 0.06f * Radius10000;
     Radius2000 = 0.2f * Radius10000;
     Radius3000 = 0.3f * Radius10000;

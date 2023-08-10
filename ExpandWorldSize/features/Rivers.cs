@@ -9,13 +9,13 @@ public class FindLakes
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     var matcher = new CodeMatcher(instructions);
-    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000);
-    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000);
-    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000);
+    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000NoStretch);
+    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000NoStretch);
+    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
     matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldloc_3);
     matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldloc_2);
-    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000);
-    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000);
+    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
+    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
     return matcher.InstructionEnumeration();
   }
 }
@@ -38,10 +38,10 @@ public class FindStreamStartPoint
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     var matcher = new CodeMatcher(instructions);
-    matcher = Helper.Replace(matcher, -10000f, () => -Configuration.WorldRadius);
-    matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius);
-    matcher = Helper.Replace(matcher, -10000f, () => -Configuration.WorldRadius);
-    matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000NoStretch);
+    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
+    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000NoStretch);
+    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
     return matcher.InstructionEnumeration();
   }
 }

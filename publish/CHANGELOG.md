@@ -1,3 +1,6 @@
+- v1.5
+  - Fixes world stretch not working with Expand World Rivers.
+
 - v1.4
   - Fixes world stretch not working with Expand World Data biome generation.
 

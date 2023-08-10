@@ -9,6 +9,9 @@ public class GetBiomeWG
   static void Prefix(WorldGenerator __instance, ref float wx, ref float wy)
   {
     if (__instance.m_world.m_menu) return;
+    // Stretch should "slow down" both GetBaseHeight and PerlinNoise.
+    // So this is the easiest way to do it.
+    // Alternatively could transpile each usage.
     wx /= Configuration.WorldStretch;
     wy /= Configuration.WorldStretch;
   }
