@@ -6,58 +6,35 @@ namespace ExpandWorldSize;
 
 public static class Helper
 {
-  public static CodeMatcher Replace(CodeMatcher instructions, float value, Func<float> call)
+  public static CodeMatcher Replace(CodeMatcher instructions, double value, double newValue)
+  {
+    return instructions
+      .MatchForward(false, new CodeMatch(OpCodes.Ldc_R8, value))
+      .SetOperandAndAdvance(newValue);
+  }
+  public static CodeMatcher Replace(CodeMatcher instructions, float value, float newValue)
   {
     return instructions
       .MatchForward(false, new CodeMatch(OpCodes.Ldc_R4, value))
-      .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
-  }
-  public static CodeMatcher ReplaceBiomeStretch(CodeMatcher instructions)
-  {
-    return instructions
-      .MatchForward(false, new(OpCodes.Ldarg_1), new(OpCodes.Add))
-      .Advance(1)
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(Configuration), nameof(Configuration.BiomeStretch))))
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Div))
-      .MatchForward(false, new(OpCodes.Ldarg_2), new(OpCodes.Add))
-      .Advance(1)
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(Configuration), nameof(Configuration.BiomeStretch))))
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Div));
-  }
-  public static CodeMatcher Replace(CodeMatcher instructions, sbyte value, Func<int> call)
-  {
-    return instructions
-      .MatchForward(false, new CodeMatch(OpCodes.Ldc_I4_S, value))
-      .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
-  }
-  public static CodeMatcher Replace(CodeMatcher instructions, int value, Func<int> call)
-  {
-    return instructions
-      .MatchForward(false, new CodeMatch(OpCodes.Ldc_I4, value))
-      .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
+      .SetOperandAndAdvance(newValue);
   }
 
-  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, Func<WorldGenerator, int> call)
+  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, int value)
   {
     return instructions
       .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), name)))
-      .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
+      .MatchBack(false, new CodeMatch(OpCodes.Ldarg_0))
+      .SetAndAdvance(OpCodes.Ldc_I4, value)
+      .SetOpcodeAndAdvance(OpCodes.Nop);
   }
-  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, Func<WorldGenerator, float> call)
+  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, float value)
   {
     return instructions
       .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), name)))
-      .SetAndAdvance(OpCodes.Call, Transpilers.EmitDelegate(call).operand);
+      .MatchBack(false, new CodeMatch(OpCodes.Ldarg_0))
+      .SetAndAdvance(OpCodes.Ldc_R4, value)
+      .SetOpcodeAndAdvance(OpCodes.Nop);
   }
-  public static CodeMatcher ReplaceStretch(CodeMatcher instructions, OpCode code)
-  {
-    return instructions
-      .MatchForward(false, new CodeMatch(code))
-      .Advance(1)
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(Configuration), nameof(Configuration.WorldStretch))))
-      .InsertAndAdvance(new CodeInstruction(OpCodes.Div));
-  }
-
 
   public static float HeightToBaseHeight(float altitude) => altitude / 200f;
   public static bool IsServer() => ZNet.instance && ZNet.instance.IsServer();

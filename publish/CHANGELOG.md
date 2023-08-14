@@ -1,3 +1,7 @@
+- v1.6
+  - Fixes for the new patch.
+  - Significantly improves performance for vanilla settings.
+
 - v1.5
   - Fixes world stretch not working with Expand World Rivers.
 

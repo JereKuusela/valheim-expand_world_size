@@ -28,9 +28,8 @@ public partial class Configuration
   public static float ForestMultiplier => ConfigWrapper.Floats[configForestMultiplier];
   public static ConfigEntry<string> configWorldStretch;
   public static ConfigEntry<string> configBiomeStretch;
-  // Special treatment for easier transpiling and performance.
-  public static float WorldStretch = 1f;
-  public static float BiomeStretch = 1f;
+  public static float WorldStretch => ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
+  public static float BiomeStretch => ConfigWrapper.Floats[configBiomeStretch] == 0f ? 1f : ConfigWrapper.Floats[configBiomeStretch];
 
 
   public static ConfigEntry<string> configSeed;
@@ -70,17 +69,7 @@ public partial class Configuration
       wrapper.Regenerate();
     };
     configWorldStretch = wrapper.BindFloat(section, "Stretch world", 1f, true, "Stretches the world to a bigger area.");
-    configWorldStretch.SettingChanged += (s, e) =>
-    {
-      WorldStretch = ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
-    };
-    WorldStretch = ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
     configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, true, "Stretches the biomes to a bigger area.");
-    configBiomeStretch.SettingChanged += (s, e) =>
-    {
-      BiomeStretch = ConfigWrapper.Floats[configBiomeStretch] == 0f ? 1f : ConfigWrapper.Floats[configBiomeStretch];
-    };
-    BiomeStretch = ConfigWrapper.Floats[configBiomeStretch] == 0f ? 1f : ConfigWrapper.Floats[configBiomeStretch];
 
     configForestMultiplier = wrapper.BindFloat(section, "Forest multiplier", 1f, true, "Multiplies the amount of forest.");
     configAltitudeMultiplier = wrapper.BindFloat(section, "Altitude multiplier", 1f, true, "Multiplies the altitude.");
@@ -102,7 +91,7 @@ public partial class Configuration
       world.m_menu = true;
       WorldGenerator.Initialize(world);
       world.m_menu = false;
-      Generate.World();
+      World.Generate();
     };
     configHeightSeed = wrapper.BindInt(section, "Height variation seed", null, true);
   }

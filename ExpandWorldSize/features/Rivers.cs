@@ -9,13 +9,13 @@ public class FindLakes
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     var matcher = new CodeMatcher(instructions);
-    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000NoStretch);
-    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000NoStretch);
-    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
-    matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldloc_3);
-    matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldloc_2);
-    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
-    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
+    matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
+    matcher = Stretch.Replace(matcher, OpCodes.Ldloc_3);
+    matcher = Stretch.Replace(matcher, OpCodes.Ldloc_2);
+    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
     return matcher.InstructionEnumeration();
   }
 }
@@ -26,8 +26,8 @@ public class IsRiverAllowed
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     var matcher = new CodeMatcher(instructions);
-    matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldfld);
-    matcher = Helper.ReplaceStretch(matcher, OpCodes.Ldfld);
+    matcher = Stretch.Replace(matcher, OpCodes.Ldfld);
+    matcher = Stretch.Replace(matcher, OpCodes.Ldfld);
     return matcher.InstructionEnumeration();
   }
 }
@@ -38,10 +38,10 @@ public class FindStreamStartPoint
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     var matcher = new CodeMatcher(instructions);
-    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000NoStretch);
-    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
-    matcher = Helper.Replace(matcher, -10000f, () => -GetBaseHeight.Radius10000NoStretch);
-    matcher = Helper.Replace(matcher, 10000f, () => GetBaseHeight.Radius10000NoStretch);
+    matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
     return matcher.InstructionEnumeration();
   }
 }
@@ -49,7 +49,7 @@ public class FindStreamStartPoint
 public class AddRivers
 {
   // Rivers are placed at unstretched positions.
-  static void Prefix(ref float wx, ref float wy)
+  public static void Prefix(ref float wx, ref float wy)
   {
     wx *= Configuration.WorldStretch;
     wy *= Configuration.WorldStretch;

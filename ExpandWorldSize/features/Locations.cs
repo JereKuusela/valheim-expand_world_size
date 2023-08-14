@@ -1,16 +1,17 @@
 using System.Collections.Generic;
-using System.Linq;
 using HarmonyLib;
 using UnityEngine;
 
 namespace ExpandWorldSize;
 
+// Patches here are not critical because called once per location entry (not on each attempt).
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocations), new[] { typeof(ZoneSystem.ZoneLocation) })]
 public class GenerateLocationsQuantity
 {
   static void Prefix(ZoneSystem.ZoneLocation location, ref int __state)
   {
     __state = location.m_quantity;
+    if (Configuration.LocationsMultiplier == 1f) return;
     if (location.m_prefabName == Game.instance.m_StartLocation) return;
     location.m_quantity = Mathf.RoundToInt(location.m_quantity * Configuration.LocationsMultiplier);
   }
@@ -52,7 +53,7 @@ public class GetRandomZone
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     var matcher = new CodeMatcher(instructions);
-    matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
     return matcher.InstructionEnumeration();
   }
 }
@@ -62,7 +63,7 @@ public class GenerateLocations
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     var matcher = new CodeMatcher(instructions);
-    matcher = Helper.Replace(matcher, 10000f, () => Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
     return matcher.InstructionEnumeration();
   }
 }

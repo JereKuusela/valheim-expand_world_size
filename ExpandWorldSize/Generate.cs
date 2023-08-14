@@ -9,28 +9,6 @@ using UnityEngine.Rendering;
 
 namespace ExpandWorldSize;
 
-public class Generate
-{
-  public static void World()
-  {
-    if (WorldGenerator.instance == null) return;
-    EWS.Log.LogInfo("Regenerating the world.");
-    GetBaseHeight.Refresh(WorldGenerator.instance);
-    MapGeneration.Cancel();
-    WorldGenerator.instance.Pregenerate();
-    foreach (var heightmap in Object.FindObjectsOfType<Heightmap>())
-    {
-      heightmap.m_buildData = null;
-      heightmap.Regenerate();
-    }
-    ClutterSystem.instance?.ClearAll();
-    SetupMaterial.Refresh();
-    WaterLayerFix.Refresh(EnvMan.instance);
-    if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
-      Minimap.instance?.GenerateWorldMap();
-  }
-}
-
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.Pregenerate)), HarmonyPriority(Priority.HigherThanNormal)]
 public class Pregenerate
 {
@@ -43,7 +21,7 @@ public class Pregenerate
     __instance.m_rivers = new();
     __instance.m_streams = new();
     __instance.m_lakes = new();
-    __instance.m_cachedRiverGrid = new Vector2i(-999999, -999999);
+    __instance.m_cachedRiverGrid = new(-999999, -999999);
     __instance.m_cachedRiverPoints = new WorldGenerator.RiverPoint[0];
     __instance.m_riverCacheLock.ExitWriteLock();
   }
