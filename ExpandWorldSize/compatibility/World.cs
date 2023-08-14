@@ -47,7 +47,7 @@ public class World
   public static void Refresh(WorldGenerator obj)
   {
     if (obj == null) return;
-    BaseWaterLevel = Helper.HeightToBaseHeight(Patcher.WaterLevel);
+    BaseWaterLevel = Helper.HeightToBaseHeight(WaterLevel);
     WorldStretch = Configuration.WorldStretch;
     BiomeStretch = Configuration.BiomeStretch;
     WaterDepth = Configuration.WaterDepthMultiplier;

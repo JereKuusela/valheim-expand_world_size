@@ -1,15 +1,9 @@
-
-using System.Collections.Generic;
 using HarmonyLib;
 
 namespace ExpandWorldSize;
 
 public static class Patcher
 {
-
-  public static float WaterLevel = 30;
-  public static float BaseWaterLevel = 0f;
-  public static float BaseAltitudeDelta = 0f;
 
   public static void Patch(Harmony harmony)
   {
@@ -18,13 +12,9 @@ public static class Patcher
     CheckWorldStretch(harmony);
     CheckWaterDepth(harmony);
     CheckForest(harmony);
+    CheckAltitude(harmony);
   }
 
-  private static void UpdateCache()
-  {
-    BaseWaterLevel = Helper.HeightToBaseHeight(WaterLevel);
-    BaseAltitudeDelta = Helper.HeightToBaseHeight(Configuration.AltitudeDelta);
-  }
 
   private static void CheckWorldStretch(Harmony harmony)
   {

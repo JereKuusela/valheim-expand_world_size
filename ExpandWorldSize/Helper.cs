@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
 
@@ -6,6 +7,16 @@ namespace ExpandWorldSize;
 
 public static class Helper
 {
+  public static IEnumerable<CodeInstruction> Floater(IEnumerable<CodeInstruction> instructions)
+  {
+    foreach (var instruction in instructions)
+    {
+      if (instruction.opcode == OpCodes.Ldc_R8) yield return new CodeInstruction(OpCodes.Ldc_R4, instruction.operand);
+      if (instruction.opcode == OpCodes.Conv_R8) continue;
+      if (instruction.opcode == OpCodes.Conv_R4) continue;
+      yield return instruction;
+    }
+  }
   public static CodeMatcher Replace(CodeMatcher instructions, double value, double newValue)
   {
     return instructions
