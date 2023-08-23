@@ -20,13 +20,13 @@ public static class Patcher
   {
     if (WorldGenerator.instance != null && !WorldGenerator.instance.m_world.m_menu && Configuration.WorldStretch != 1f) return;
     var method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight));
-    var patch = AccessTools.Method(typeof(BiomeHeight), nameof(Stretch.GetBiomeHeight));
+    var patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.GetBiomeHeight));
     harmony.Unpatch(method, patch);
     method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) });
-    patch = AccessTools.Method(typeof(BiomeHeight), nameof(Stretch.GetBiome));
+    patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.GetBiome));
     harmony.Unpatch(method, patch);
     method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.AddRivers));
-    patch = AccessTools.Method(typeof(BiomeHeight), nameof(AddRivers.Prefix));
+    patch = AccessTools.Method(typeof(AddRivers), nameof(AddRivers.Prefix));
     harmony.Unpatch(method, patch);
   }
   private static void CheckWaterDepth(Harmony harmony)
