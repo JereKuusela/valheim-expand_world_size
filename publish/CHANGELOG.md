@@ -1,3 +1,7 @@
+- v1.8
+  - Fixes debug commands not working.
+  - Fixes settings Offset X and Offset Y not working.
+
 - v1.7
   - Fixes for the new patch.
 

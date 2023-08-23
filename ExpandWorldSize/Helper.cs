@@ -18,21 +18,13 @@ public static class Helper
       .SetOperandAndAdvance(newValue);
   }
 
-  public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, int value)
-  {
-    return instructions
-      .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), name)))
-      .MatchBack(false, new CodeMatch(OpCodes.Ldarg_0))
-      .SetAndAdvance(OpCodes.Ldc_I4, value)
-      .SetOpcodeAndAdvance(OpCodes.Nop);
-  }
   public static CodeMatcher ReplaceSeed(CodeMatcher instructions, string name, float value)
   {
     return instructions
       .MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), name)))
-      .MatchBack(false, new CodeMatch(OpCodes.Ldarg_0))
+      .Advance(-1)
       .SetAndAdvance(OpCodes.Ldc_R4, value)
-      .SetOpcodeAndAdvance(OpCodes.Nop);
+      .RemoveInstruction();
   }
 
   public static float HeightToBaseHeight(float altitude) => altitude / 200f;

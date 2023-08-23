@@ -7,42 +7,42 @@ public partial class Configuration
 {
 #nullable disable
   public static ConfigEntry<string> configWorldRadius;
-  public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius];
+  public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius] ?? 10000f;
   public static ConfigEntry<string> configWorldEdgeSize;
-  public static float WorldEdgeSize => ConfigWrapper.Floats[configWorldEdgeSize];
+  public static float WorldEdgeSize => ConfigWrapper.Floats[configWorldEdgeSize] ?? 500f;
   public static float WorldTotalRadius => WorldRadius + WorldEdgeSize;
   public static ConfigEntry<string> configMapSize;
-  public static float MapSize => ConfigWrapper.Floats[configMapSize];
+  public static float MapSize => ConfigWrapper.Floats[configMapSize] ?? 1f;
   public static ConfigEntry<string> configMapPixelSize;
-  public static float MapPixelSize => ConfigWrapper.Floats[configMapPixelSize];
+  public static float MapPixelSize => ConfigWrapper.Floats[configMapPixelSize] ?? 1f;
 
   public static ConfigEntry<string> configAltitudeMultiplier;
-  public static float AltitudeMultiplier => ConfigWrapper.Floats[configAltitudeMultiplier];
+  public static float AltitudeMultiplier => ConfigWrapper.Floats[configAltitudeMultiplier] ?? 1f;
   public static ConfigEntry<string> configAltitudeDelta;
-  public static float AltitudeDelta => ConfigWrapper.Floats[configAltitudeDelta];
+  public static float AltitudeDelta => ConfigWrapper.Floats[configAltitudeDelta] ?? 0f;
 
   public static ConfigEntry<string> configLocationsMultiplier;
-  public static float LocationsMultiplier => ConfigWrapper.Floats[configLocationsMultiplier];
+  public static float LocationsMultiplier => ConfigWrapper.Floats[configLocationsMultiplier] ?? 1f;
 
   public static ConfigEntry<string> configForestMultiplier;
-  public static float ForestMultiplier => ConfigWrapper.Floats[configForestMultiplier];
+  public static float ForestMultiplier => ConfigWrapper.Floats[configForestMultiplier] ?? 1f;
   public static ConfigEntry<string> configWorldStretch;
   public static ConfigEntry<string> configBiomeStretch;
-  public static float WorldStretch => ConfigWrapper.Floats[configWorldStretch] == 0f ? 1f : ConfigWrapper.Floats[configWorldStretch];
-  public static float BiomeStretch => ConfigWrapper.Floats[configBiomeStretch] == 0f ? 1f : ConfigWrapper.Floats[configBiomeStretch];
+  public static float WorldStretch => ConfigWrapper.Floats[configWorldStretch] ?? 1f;
+  public static float BiomeStretch => ConfigWrapper.Floats[configBiomeStretch] ?? 1f;
 
 
   public static ConfigEntry<string> configSeed;
   public static string Seed => configSeed.Value;
 
   public static ConfigEntry<string> configOffsetX;
-  public static int? OffsetX => ConfigWrapper.Ints[configOffsetX];
+  public static float? OffsetX => ConfigWrapper.Floats[configOffsetX];
   public static ConfigEntry<string> configOffsetY;
-  public static int? OffsetY => ConfigWrapper.Ints[configOffsetY];
+  public static float? OffsetY => ConfigWrapper.Floats[configOffsetY];
   public static ConfigEntry<string> configHeightSeed;
-  public static int? HeightSeed => ConfigWrapper.Ints[configHeightSeed];
+  public static float? HeightSeed => ConfigWrapper.Floats[configHeightSeed];
   public static ConfigEntry<string> configWaterDepthMultiplier;
-  public static float WaterDepthMultiplier => ConfigWrapper.Floats[configWaterDepthMultiplier];
+  public static float WaterDepthMultiplier => ConfigWrapper.Floats[configWaterDepthMultiplier] ?? 0;
 #nullable enable
   public static void Init(ConfigWrapper wrapper)
   {
@@ -76,8 +76,8 @@ public partial class Configuration
     configAltitudeDelta = wrapper.BindFloat(section, "Altitude delta", 0f, true, "Adds to the altitude.");
     configWaterDepthMultiplier = wrapper.BindFloat(section, "Water depth multiplier", 1f, true, "Multplies the water depth.");
     configLocationsMultiplier = wrapper.BindFloat(section, "Locations", 1f, true, "Multiplies the max amount of locations.");
-    configOffsetX = wrapper.BindInt(section, "Offset X", null, true);
-    configOffsetY = wrapper.BindInt(section, "Offset Y", null, true);
+    configOffsetX = wrapper.BindFloat(section, "Offset X", null, true);
+    configOffsetY = wrapper.BindFloat(section, "Offset Y", null, true);
     configSeed = wrapper.Bind(section, "Seed", "", false);
     configSeed.SettingChanged += (s, e) =>
     {
@@ -93,6 +93,6 @@ public partial class Configuration
       world.m_menu = false;
       World.Generate();
     };
-    configHeightSeed = wrapper.BindInt(section, "Height variation seed", null, true);
+    configHeightSeed = wrapper.BindFloat(section, "Height variation seed", null, true);
   }
 }

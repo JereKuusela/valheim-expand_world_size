@@ -37,12 +37,12 @@ public class GetBaseHeight
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     var matcher = new CodeMatcher(instructions);
-    matcher = matcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.m_offset0))));
+    // Skipping the menu part.
     matcher = matcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.m_offset1))));
     if (Configuration.OffsetX != null)
-      matcher = matcher.SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_R4, Configuration.OffsetX.Value));
+      matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset0), Configuration.OffsetX.Value);
     if (Configuration.OffsetY != null)
-      matcher = matcher.SetInstructionAndAdvance(new CodeInstruction(OpCodes.Ldc_R4, Configuration.OffsetY.Value));
+      matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset1), Configuration.OffsetY.Value);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, 10500f, Configuration.WorldTotalRadius);

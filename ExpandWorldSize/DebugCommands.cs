@@ -4,17 +4,10 @@ using HarmonyLib;
 namespace ExpandWorldSize;
 
 [HarmonyPatch(typeof(Terminal), nameof(Terminal.InitTerminal))]
-public class SetCommands
-{
-  static void Postfix()
-  {
-    new DebugCommands();
-  }
-}
-
 public class DebugCommands
 {
-  public DebugCommands()
+  [HarmonyPostfix]
+  public static void Add()
   {
     new Terminal.ConsoleCommand("ew_seeds", "- Prints different seeds.", args =>
     {
