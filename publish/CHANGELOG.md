@@ -1,3 +1,6 @@
+- v1.9
+  - Fixes world trying to regenerate on the main menu when changing settings.
+
 - v1.8
   - Fixes debug commands not working.
   - Fixes settings Offset X and Offset Y not working.

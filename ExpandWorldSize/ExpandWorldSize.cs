@@ -12,7 +12,7 @@ public class EWS : BaseUnityPlugin
 {
   public const string GUID = "expand_world_size";
   public const string NAME = "Expand World Size";
-  public const string VERSION = "1.8";
+  public const string VERSION = "1.9";
 #nullable disable
   public static ManualLogSource Log;
   public static Harmony harmony;
@@ -72,7 +72,7 @@ public class EWS : BaseUnityPlugin
   public void InvokeRegenerate()
   {
     // Nothing to regenerate because the world hasn't been generated yet.
-    if (WorldGenerator.instance == null) return;
+    if (WorldGenerator.instance?.m_world?.m_menu != false) return;
     // Debounced for smooth config editing.
     CancelInvoke("Regenerate");
     Invoke("Regenerate", 1.0f);
