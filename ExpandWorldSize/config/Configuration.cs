@@ -91,7 +91,7 @@ public partial class Configuration
       world.m_menu = true;
       WorldGenerator.Initialize(world);
       world.m_menu = false;
-      World.Generate();
+      WorldInfo.Generate();
     };
     configHeightSeed = wrapper.BindFloat(section, "Height variation seed", null, true);
   }

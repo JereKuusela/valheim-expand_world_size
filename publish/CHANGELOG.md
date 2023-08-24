@@ -1,3 +1,9 @@
+- v1.10
+  - Fixes main menu sometimes being affected by the changes.
+  - Fixes map size setting not working.
+  - Fixes seed setting not working.
+  - Fixes some settings not always being loaded.
+
 - v1.9
   - Fixes world trying to regenerate on the main menu when changing settings.
 

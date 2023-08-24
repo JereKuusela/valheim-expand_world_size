@@ -1,13 +1,10 @@
-
-
-using System;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace ExpandWorldSize;
 
-public class World
+public class WorldInfo
 {
   // Everything used in prefix or postfix should have cached value here.
   // Transpilers use the direct value so doesn't need to be cached.
@@ -23,6 +20,7 @@ public class World
 
   public static void SetWaterLevel(float waterLevel)
   {
+    if (WaterLevel == waterLevel) return;
     WaterLevel = waterLevel;
     Refresh(WorldGenerator.instance);
   }
@@ -33,7 +31,7 @@ public class World
     Refresh(WorldGenerator.instance);
     MapGeneration.Cancel();
     WorldGenerator.instance.Pregenerate();
-    foreach (var heightmap in UnityEngine.Object.FindObjectsOfType<Heightmap>())
+    foreach (var heightmap in Object.FindObjectsOfType<Heightmap>())
     {
       heightmap.m_buildData = null;
       heightmap.Regenerate();
@@ -44,9 +42,9 @@ public class World
     if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
       Minimap.instance?.GenerateWorldMap();
   }
-  public static void Refresh(WorldGenerator obj)
+  public static void Refresh(WorldGenerator wg)
   {
-    if (obj == null) return;
+    if (wg == null) return;
     BaseWaterLevel = Helper.HeightToBaseHeight(WaterLevel);
     WorldStretch = Configuration.WorldStretch;
     BiomeStretch = Configuration.BiomeStretch;
@@ -54,9 +52,9 @@ public class World
     AltitudeMultiplier = Configuration.AltitudeMultiplier;
     ForestMultiplier = Configuration.ForestMultiplier;
     BaseAltitudeDelta = Helper.HeightToBaseHeight(Configuration.AltitudeDelta);
-    obj.maxMarshDistance = VersionSetup.MaxMarshDistance * Configuration.WorldRadius / 10000f / Configuration.WorldStretch;
+    wg.maxMarshDistance = VersionSetup.MaxMarshDistance * Configuration.WorldRadius / 10000f / Configuration.WorldStretch;
     EWD.RefreshSize();
-    Patcher.Patch(EWS.harmony);
+    Patcher.Patch(wg);
   }
 
 }
@@ -72,7 +70,19 @@ public class VersionSetup
   static void Postfix(WorldGenerator __instance)
   {
     MaxMarshDistance = __instance.maxMarshDistance;
-    World.Refresh(__instance);
   }
+}
 
+[HarmonyPatch(typeof(World), nameof(World.LoadWorld))]
+public class LoadWorld
+{
+  static World Postfix(World result)
+  {
+    if (Configuration.Seed != "" && !result.m_menu)
+    {
+      result.m_seedName = Configuration.Seed;
+      result.m_seed = Configuration.Seed.GetStableHashCode();
+    }
+    return result;
+  }
 }

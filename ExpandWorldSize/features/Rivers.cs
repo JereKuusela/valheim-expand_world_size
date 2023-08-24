@@ -8,6 +8,7 @@ public class FindLakes
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
+    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
     var matcher = new CodeMatcher(instructions);
     matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
@@ -25,6 +26,7 @@ public class IsRiverAllowed
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
+    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
     var matcher = new CodeMatcher(instructions);
     matcher = Stretch.Replace(matcher, OpCodes.Ldfld);
     matcher = Stretch.Replace(matcher, OpCodes.Ldfld);
@@ -37,6 +39,7 @@ public class FindStreamStartPoint
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
+    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
     var matcher = new CodeMatcher(instructions);
     matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);

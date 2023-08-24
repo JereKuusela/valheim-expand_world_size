@@ -13,7 +13,7 @@ public class EWD
   {
     if (!Chainloader.PluginInfos.TryGetValue(GUID, out var info)) return;
     Assembly = info.Instance.GetType().Assembly;
-    var type = Assembly.GetType("ExpandWorldData.World");
+    var type = Assembly.GetType("ExpandWorldData.WorldInfo");
     if (type == null) return;
     SetSize = AccessTools.Method(type, "Set");
     if (SetSize == null) return;

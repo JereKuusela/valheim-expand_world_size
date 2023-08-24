@@ -47,10 +47,11 @@ public class Stretch
       .InsertAndAdvance(new CodeInstruction(OpCodes.Div));
   }
 
-  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), typeof(float), typeof(float)), HarmonyTranspiler]
+  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), typeof(float), typeof(float))]
 
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
+    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
     var matcher = new CodeMatcher(instructions);
     matcher = ReplaceBiome(matcher);
     matcher = ReplaceBiome(matcher);

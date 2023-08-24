@@ -6,8 +6,7 @@ namespace ExpandWorldSize;
 [HarmonyPatch(typeof(Terminal), nameof(Terminal.InitTerminal))]
 public class DebugCommands
 {
-  [HarmonyPostfix]
-  public static void Add()
+  static void Postfix()
   {
     new Terminal.ConsoleCommand("ew_seeds", "- Prints different seeds.", args =>
     {

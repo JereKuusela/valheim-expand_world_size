@@ -36,6 +36,7 @@ public class GetBaseHeight
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
+    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
     var matcher = new CodeMatcher(instructions);
     // Skipping the menu part.
     matcher = matcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.m_offset1))));

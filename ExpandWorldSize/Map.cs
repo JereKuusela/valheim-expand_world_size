@@ -10,7 +10,7 @@ public class MinimapAwake
   public static float OriginalPixelSize;
   public static int OriginalTextureSize;
   public static float OriginalMinZoom;
-  static void Postfix(Minimap __instance)
+  public static void Postfix(Minimap __instance)
   {
     OriginalTextureSize = __instance.m_textureSize;
     __instance.m_textureSize = (int)(__instance.m_textureSize * Configuration.MapSize);
@@ -25,7 +25,7 @@ public class MinimapAwake
 [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetMapData))]
 public class InitializeWhenDimensionsChange
 {
-  static bool Prefix(Minimap __instance, byte[] data)
+  public static bool Prefix(Minimap __instance, byte[] data)
   {
     var obj = __instance;
     ZPackage zpackage = new(data);

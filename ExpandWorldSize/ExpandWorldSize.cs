@@ -12,10 +12,9 @@ public class EWS : BaseUnityPlugin
 {
   public const string GUID = "expand_world_size";
   public const string NAME = "Expand World Size";
-  public const string VERSION = "1.9";
+  public const string VERSION = "1.10";
 #nullable disable
   public static ManualLogSource Log;
-  public static Harmony harmony;
 #nullable enable
   public static ServerSync.ConfigSync ConfigSync = new(GUID)
   {
@@ -33,8 +32,7 @@ public class EWS : BaseUnityPlugin
     Configuration.Init(wrapper);
     if (NeedsMigration)
       MigrateOldConfig();
-    harmony = new(GUID);
-    harmony.Patch(AccessTools.Method(typeof(Terminal), nameof(Terminal.InitTerminal)), null, new HarmonyMethod(typeof(DebugCommands), nameof(DebugCommands.Add)));
+    Patcher.Init(new(GUID));
     try
     {
       SetupWatcher();
@@ -77,7 +75,7 @@ public class EWS : BaseUnityPlugin
     CancelInvoke("Regenerate");
     Invoke("Regenerate", 1.0f);
   }
-  public void Regenerate() => World.Generate();
+  public void Regenerate() => WorldInfo.Generate();
 #pragma warning disable IDE0051
   private void OnDestroy()
   {
