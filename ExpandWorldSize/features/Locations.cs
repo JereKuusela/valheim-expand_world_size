@@ -52,7 +52,7 @@ public class GetRandomZone
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    var matcher = new CodeMatcher(instructions);
+    CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
     return matcher.InstructionEnumeration();
   }
@@ -62,7 +62,7 @@ public class GenerateLocations
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    var matcher = new CodeMatcher(instructions);
+    CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
     return matcher.InstructionEnumeration();
   }

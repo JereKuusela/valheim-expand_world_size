@@ -1,4 +1,5 @@
 - v1.10
+  - Adds world size support for Better Continents (untested).
   - Fixes main menu sometimes being affected by the changes.
   - Fixes map size setting not working.
   - Fixes seed setting not working.

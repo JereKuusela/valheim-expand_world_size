@@ -17,12 +17,12 @@ public class Pregenerate
     // River points must at least be cleaned.
     // But better clean up everything.
     __instance.m_riverCacheLock.EnterWriteLock();
-    __instance.m_riverPoints = new();
-    __instance.m_rivers = new();
-    __instance.m_streams = new();
-    __instance.m_lakes = new();
+    __instance.m_riverPoints = [];
+    __instance.m_rivers = [];
+    __instance.m_streams = [];
+    __instance.m_lakes = [];
     __instance.m_cachedRiverGrid = new(-999999, -999999);
-    __instance.m_cachedRiverPoints = new WorldGenerator.RiverPoint[0];
+    __instance.m_cachedRiverPoints = [];
     __instance.m_riverCacheLock.ExitWriteLock();
   }
 }
@@ -63,19 +63,19 @@ public class MapGeneration
   {
     if (map.m_textureSize == textureSize) return;
     map.m_textureSize = textureSize;
-    map.m_mapTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
+    map.m_mapTexture = new(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
     {
       wrapMode = TextureWrapMode.Clamp
     };
-    map.m_forestMaskTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
+    map.m_forestMaskTexture = new(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
     {
       wrapMode = TextureWrapMode.Clamp
     };
-    map.m_heightTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RFloat, false)
+    map.m_heightTexture = new(map.m_textureSize, map.m_textureSize, TextureFormat.RFloat, false)
     {
       wrapMode = TextureWrapMode.Clamp
     };
-    map.m_fogTexture = new Texture2D(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
+    map.m_fogTexture = new(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
     {
       wrapMode = TextureWrapMode.Clamp
     };
@@ -176,7 +176,7 @@ public class MapGeneration
                 var biomeHeight = wg.GetBiomeHeight(biome, wx, wy, out var mask);
                 mapTexture[i * textureSize + j] = map.GetPixelColor(biome);
                 forestMaskTexture[i * textureSize + j] = map.GetMaskColor(wx, wy, biomeHeight, biome);
-                heightTexture[i * textureSize + j] = new Color(biomeHeight, 0f, 0f);
+                heightTexture[i * textureSize + j] = new(biomeHeight, 0f, 0f);
                 if (ct.IsCancellationRequested)
                   ct.ThrowIfCancellationRequested();
               }

@@ -54,6 +54,7 @@ public class WorldInfo
     BaseAltitudeDelta = Helper.HeightToBaseHeight(Configuration.AltitudeDelta);
     wg.maxMarshDistance = VersionSetup.MaxMarshDistance * Configuration.WorldRadius / 10000f / Configuration.WorldStretch;
     EWD.RefreshSize();
+    BetterContinents.RefreshSize();
     Patcher.Patch(wg);
   }
 

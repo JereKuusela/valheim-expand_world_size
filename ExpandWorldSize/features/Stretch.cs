@@ -52,11 +52,11 @@ public class Stretch
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
-    var matcher = new CodeMatcher(instructions);
+    CodeMatcher matcher = new(instructions);
     matcher = ReplaceBiome(matcher);
     matcher = ReplaceBiome(matcher);
     matcher = ReplaceBiome(matcher);
-    matcher = new CodeMatcher(matcher.InstructionEnumeration());
+    matcher = new(matcher.InstructionEnumeration());
 
     matcher = Helper.Replace(matcher, -4000d, -0.4 * Configuration.WorldRadius / Configuration.WorldStretch);
     matcher = Helper.Replace(matcher, 12000d, 1.2 * Configuration.WorldRadius / Configuration.WorldStretch);

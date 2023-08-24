@@ -10,7 +10,7 @@ public class HeightSeed
   {
     if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
     if (Configuration.HeightSeed == null) return instructions;
-    var matcher = new CodeMatcher(instructions);
+    CodeMatcher matcher = new(instructions);
     matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset3), Configuration.HeightSeed.Value);
     return matcher.InstructionEnumeration();
   }

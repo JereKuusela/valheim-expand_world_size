@@ -8,7 +8,7 @@ public class WorldSizeHelper
 {
   public static IEnumerable<CodeInstruction> EdgeCheck(IEnumerable<CodeInstruction> instructions)
   {
-    var matcher = new CodeMatcher(instructions);
+    CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10420f, Configuration.WorldTotalRadius - 80);
     matcher = Helper.Replace(matcher, 10500f, Configuration.WorldTotalRadius);
     return matcher.InstructionEnumeration();
@@ -37,7 +37,7 @@ public class GetBaseHeight
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
-    var matcher = new CodeMatcher(instructions);
+    CodeMatcher matcher = new(instructions);
     // Skipping the menu part.
     matcher = matcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.m_offset1))));
     if (Configuration.OffsetX != null)
@@ -87,7 +87,7 @@ public class UpdateWind
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    var matcher = new CodeMatcher(instructions);
+    CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10500f, Configuration.WorldRadius);
     // Removes the subtraction of m_edgeOfWorldWidth (already applied above).
     matcher = matcher
@@ -110,7 +110,7 @@ public class GetWaterSurface
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    var matcher = new CodeMatcher(instructions);
+    CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10500f, Configuration.WorldTotalRadius);
     return matcher.InstructionEnumeration();
   }
