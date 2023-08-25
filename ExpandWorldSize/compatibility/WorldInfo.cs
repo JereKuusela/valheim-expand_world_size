@@ -9,7 +9,7 @@ public class WorldInfo
   // Everything used in prefix or postfix should have cached value here.
   // Transpilers use the direct value so doesn't need to be cached.
   public static float WaterLevel = 30f;
-  public static float BaseWaterLevel = 0f;
+  public static float BaseWaterLevel = Helper.HeightToBaseHeight(WaterLevel);
   public static float WorldStretch = 1f;
   public static float BiomeStretch = 1f;
   public static float WaterDepth = 1f;
@@ -22,13 +22,13 @@ public class WorldInfo
   {
     if (WaterLevel == waterLevel) return;
     WaterLevel = waterLevel;
-    Refresh(WorldGenerator.instance);
+    BaseWaterLevel = Helper.HeightToBaseHeight(WaterLevel);
   }
   public static void Generate()
   {
     if (WorldGenerator.instance == null) return;
     EWS.Log.LogInfo("Regenerating the world.");
-    Refresh(WorldGenerator.instance);
+    Refresh();
     MapGeneration.Cancel();
     WorldGenerator.instance.Pregenerate();
     foreach (var heightmap in Object.FindObjectsOfType<Heightmap>())
@@ -42,20 +42,19 @@ public class WorldInfo
     if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
       Minimap.instance?.GenerateWorldMap();
   }
-  public static void Refresh(WorldGenerator wg)
+  public static void Refresh()
   {
-    if (wg == null) return;
-    BaseWaterLevel = Helper.HeightToBaseHeight(WaterLevel);
     WorldStretch = Configuration.WorldStretch;
     BiomeStretch = Configuration.BiomeStretch;
     WaterDepth = Configuration.WaterDepthMultiplier;
     AltitudeMultiplier = Configuration.AltitudeMultiplier;
     ForestMultiplier = Configuration.ForestMultiplier;
     BaseAltitudeDelta = Helper.HeightToBaseHeight(Configuration.AltitudeDelta);
-    wg.maxMarshDistance = VersionSetup.MaxMarshDistance * Configuration.WorldRadius / 10000f / Configuration.WorldStretch;
+    if (Patcher.WG != null)
+      Patcher.WG.maxMarshDistance = VersionSetup.MaxMarshDistance * Configuration.WorldRadius / 10000f / Configuration.WorldStretch;
     EWD.RefreshSize();
     BetterContinents.RefreshSize();
-    Patcher.Patch(wg);
+    Patcher.Patch();
   }
 
 }

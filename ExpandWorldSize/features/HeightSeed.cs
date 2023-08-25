@@ -8,7 +8,7 @@ public class HeightSeed
 {
   static IEnumerable<CodeInstruction> Transpile(IEnumerable<CodeInstruction> instructions)
   {
-    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
+    if (Patcher.IsMenu) return instructions;
     if (Configuration.HeightSeed == null) return instructions;
     CodeMatcher matcher = new(instructions);
     matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset3), Configuration.HeightSeed.Value);

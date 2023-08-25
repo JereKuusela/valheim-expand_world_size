@@ -8,11 +8,13 @@ public class FindLakes
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
+    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
+    // Looped coordinates are NOT streched, so limits must NOT be streched.
     matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
+    // And coordinates must be streched for GetBaseHeight.
     matcher = Stretch.Replace(matcher, OpCodes.Ldloc_3);
     matcher = Stretch.Replace(matcher, OpCodes.Ldloc_2);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
@@ -26,8 +28,9 @@ public class IsRiverAllowed
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
+    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
+    // Coordinates are NOT streched, so they must be streched for GetBaseHeight.
     matcher = Stretch.Replace(matcher, OpCodes.Ldfld);
     matcher = Stretch.Replace(matcher, OpCodes.Ldfld);
     return matcher.InstructionEnumeration();
@@ -39,7 +42,7 @@ public class FindStreamStartPoint
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
+    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
@@ -51,7 +54,7 @@ public class FindStreamStartPoint
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.AddRivers))]
 public class AddRivers
 {
-  // Rivers are placed at unstretched positions.
+  // Incoming coordinates are stretched, so they must be unstreched for the river database.
   public static void Prefix(ref float wx, ref float wy)
   {
     wx *= Configuration.WorldStretch;

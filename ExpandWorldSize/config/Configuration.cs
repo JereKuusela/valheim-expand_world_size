@@ -8,9 +8,11 @@ public partial class Configuration
 #nullable disable
   public static ConfigEntry<string> configWorldRadius;
   public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius] ?? 10000f;
+  public static float StrechedWorldRadius => WorldRadius / WorldStretch;
   public static ConfigEntry<string> configWorldEdgeSize;
   public static float WorldEdgeSize => ConfigWrapper.Floats[configWorldEdgeSize] ?? 500f;
   public static float WorldTotalRadius => WorldRadius + WorldEdgeSize;
+  public static float StrechedWorldTotalRadius => WorldTotalRadius / WorldStretch;
   public static ConfigEntry<string> configMapSize;
   public static float MapSize => ConfigWrapper.Floats[configMapSize] ?? 1f;
   public static ConfigEntry<string> configMapPixelSize;

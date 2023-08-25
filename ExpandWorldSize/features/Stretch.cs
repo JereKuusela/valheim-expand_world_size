@@ -51,25 +51,25 @@ public class Stretch
 
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
+    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     matcher = ReplaceBiome(matcher);
     matcher = ReplaceBiome(matcher);
     matcher = ReplaceBiome(matcher);
     matcher = new(matcher.InstructionEnumeration());
 
-    matcher = Helper.Replace(matcher, -4000d, -0.4 * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 12000d, 1.2 * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 4000d, 0.4 * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 12000d, 1.2 * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 2000f, 0.2f * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 6000d, 0.6 * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 3000d, 0.3 * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 8000f, 0.8f * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 600d, 0.06 * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 6000f, 0.6f * Configuration.WorldRadius / Configuration.WorldStretch);
-    matcher = Helper.Replace(matcher, 5000d, 0.5 * Configuration.WorldRadius / Configuration.WorldStretch);
+    matcher = Helper.Replace(matcher, -4000d, -0.4 * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 12000d, 1.2 * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 4000d, 0.4 * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 12000d, 1.2 * Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, 2000f, 0.2f * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 6000d, 0.6 * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 10000f, Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 3000d, 0.3 * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 8000f, 0.8f * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 600d, 0.06 * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 6000f, 0.6f * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 5000d, 0.5 * Configuration.StrechedWorldRadius);
     return matcher.InstructionEnumeration();
   }
 

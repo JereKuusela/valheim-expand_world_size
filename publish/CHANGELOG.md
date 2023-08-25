@@ -1,3 +1,7 @@
+- v1.11
+  - Fixes multiplayer.
+  - Fixes world stretch extending the world size.
+
 - v1.10
   - Adds world size support for Better Continents (untested).
   - Fixes main menu sometimes being affected by the changes.

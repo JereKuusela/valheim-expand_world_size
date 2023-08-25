@@ -36,7 +36,7 @@ public class GetBaseHeight
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    if (WorldGenerator.instance == null || WorldGenerator.instance.m_world.m_menu) return instructions;
+    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     // Skipping the menu part.
     matcher = matcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.m_offset1))));
@@ -44,11 +44,12 @@ public class GetBaseHeight
       matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset0), Configuration.OffsetX.Value);
     if (Configuration.OffsetY != null)
       matcher = Helper.ReplaceSeed(matcher, nameof(WorldGenerator.m_offset1), Configuration.OffsetY.Value);
-    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
-    matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
-    matcher = Helper.Replace(matcher, 10500f, Configuration.WorldTotalRadius);
-    matcher = Helper.Replace(matcher, 10490f, Configuration.WorldTotalRadius - 10f);
-    matcher = Helper.Replace(matcher, 10500f, Configuration.WorldTotalRadius);
+    // Incoming coordinates are stretched, so all limits must be stretched as well.
+    matcher = Helper.Replace(matcher, 10000f, Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 10000f, Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 10500f, Configuration.StrechedWorldTotalRadius);
+    matcher = Helper.Replace(matcher, 10490f, (Configuration.WorldTotalRadius - 10f) / Configuration.WorldStretch);
+    matcher = Helper.Replace(matcher, 10500f, Configuration.StrechedWorldTotalRadius);
     return matcher.InstructionEnumeration();
   }
 }
