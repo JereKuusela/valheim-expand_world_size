@@ -1,3 +1,6 @@
+- v1.12
+  - Fixes world stretch messing up Deep North.
+
 - v1.11
   - Fixes multiplayer.
   - Fixes world stretch extending the world size.

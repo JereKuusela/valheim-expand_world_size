@@ -61,7 +61,7 @@ public class Stretch
     matcher = Helper.Replace(matcher, -4000d, -0.4 * Configuration.StrechedWorldRadius);
     matcher = Helper.Replace(matcher, 12000d, 1.2 * Configuration.StrechedWorldRadius);
     matcher = Helper.Replace(matcher, 4000d, 0.4 * Configuration.StrechedWorldRadius);
-    matcher = Helper.Replace(matcher, 12000d, 1.2 * Configuration.WorldRadius);
+    matcher = Helper.Replace(matcher, 12000d, 1.2 * Configuration.StrechedWorldRadius);
     matcher = Helper.Replace(matcher, 2000f, 0.2f * Configuration.StrechedWorldRadius);
     matcher = Helper.Replace(matcher, 6000d, 0.6 * Configuration.StrechedWorldRadius);
     matcher = Helper.Replace(matcher, 10000f, Configuration.StrechedWorldRadius);
