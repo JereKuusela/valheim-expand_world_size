@@ -6,6 +6,9 @@ namespace ExpandWorldSize;
 public partial class Configuration
 {
 #nullable disable
+
+  public static ConfigEntry<bool> configRegenerateMap;
+  public static bool RegenerateMap => configRegenerateMap.Value;
   public static ConfigEntry<string> configWorldRadius;
   public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius] ?? 10000f;
   public static float StrechedWorldRadius => WorldRadius / WorldStretch;
@@ -49,6 +52,7 @@ public partial class Configuration
   public static void Init(ConfigWrapper wrapper)
   {
     var section = "1. General";
+    configRegenerateMap = wrapper.Bind(section, "Regenerate map", true, false, "If true, the world map is regenerated automatically on data changes.");
     configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, true, "Radius of the world in meters (excluding the edge).");
     configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500f, true, "Size of the edge area in meters (added to the radius for the total size).");
     configMapSize = wrapper.BindFloat(section, "Minimap size", 1f, false, "Increases the minimap size, but also significantly increases the generation time.");

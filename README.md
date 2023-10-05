@@ -12,7 +12,7 @@ Settings are automatically reloaded (consider using [Configuration manager](http
 
 Note: Pay extra attention when loading old worlds. Certain configurations can modify the terrain significantly and destroy your buildings.
 
-Note: Minimap is generated as a background task. This is indicated by a small `Loading` text on the upper right corner.
+Note: Minimap is generated as a background task. This is indicated by a small `Loading` text on the upper right corner. This can be disabled in the config and manually done with the command `ew_map`.
 
 Note: Old configuration from Expand World is automatically migrated to this mod.
 

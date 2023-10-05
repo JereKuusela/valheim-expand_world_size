@@ -39,6 +39,10 @@ public class WorldInfo
     ClutterSystem.instance?.ClearAll();
     SetupMaterial.Refresh();
     WaterLayerFix.Refresh(EnvMan.instance);
+    if (Configuration.RegenerateMap) Map();
+  }
+  public static void Map()
+  {
     if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
       Minimap.instance?.GenerateWorldMap();
   }

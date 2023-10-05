@@ -8,6 +8,10 @@ public class DebugCommands
 {
   static void Postfix()
   {
+    new Terminal.ConsoleCommand("ew_map", "Refreshes the world map.", (args) =>
+    {
+      WorldInfo.Map();
+    }, true);
     new Terminal.ConsoleCommand("ew_seeds", "- Prints different seeds.", args =>
     {
       var wg = WorldGenerator.m_instance;
