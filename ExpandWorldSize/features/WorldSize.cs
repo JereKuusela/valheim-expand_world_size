@@ -67,18 +67,17 @@ public class SetupMaterial
   }
   public static void Prefix(WaterVolume __instance)
   {
-    var obj = __instance;
-    obj.m_waterSurface.material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
+    __instance.m_waterSurface.material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
   }
 }
 
 [HarmonyPatch(typeof(EnvMan), nameof(EnvMan.Awake))]
-public class WaterLayerFix
+public class ScaleGlobalWaterSurface
 {
   public static void Refresh(EnvMan obj)
   {
-    var water = obj.transform.Find("WaterPlane")?.Find("watersurface");
-    water?.GetComponent<MeshRenderer>()?.material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
+    var water = obj.transform.Find("WaterPlane").Find("watersurface");
+    water.GetComponent<MeshRenderer>().material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
   }
   public static void Postfix(EnvMan __instance) => Refresh(__instance);
 }

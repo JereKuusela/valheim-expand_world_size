@@ -11,6 +11,7 @@ public class BetterContinents
   private static FieldInfo? SettingsField;
   private static FieldInfo? IsEnabledField;
   private static FieldInfo? WorldSizeField;
+  private static FieldInfo? EdgeSizeField;
   public static void Run()
   {
     if (!Chainloader.PluginInfos.TryGetValue(GUID, out var info)) return;
@@ -26,6 +27,7 @@ public class BetterContinents
     if (type == null) return;
     WorldSizeField = AccessTools.Field(type, "WorldSize");
     if (WorldSizeField == null) return;
+    EdgeSizeField = AccessTools.Field(type, "EdgeSize");
     EWS.Log.LogInfo("\"Better Continents\" detected. Applying compatibility.");
   }
 
@@ -41,5 +43,7 @@ public class BetterContinents
   {
     if (WorldSizeField == null) return;
     WorldSizeField.SetValue(null, Configuration.WorldTotalRadius);
+    if (EdgeSizeField == null) return;
+    EdgeSizeField.SetValue(null, Configuration.WorldEdgeSize);
   }
 }

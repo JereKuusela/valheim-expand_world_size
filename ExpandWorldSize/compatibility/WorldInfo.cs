@@ -26,7 +26,7 @@ public class WorldInfo
   }
   public static void Generate()
   {
-    if (WorldGenerator.instance == null) return;
+    if (Patcher.IsMenu) return;
     EWS.Log.LogInfo("Regenerating the world.");
     Refresh();
     MapGeneration.Cancel();
@@ -38,7 +38,8 @@ public class WorldInfo
     }
     ClutterSystem.instance?.ClearAll();
     SetupMaterial.Refresh();
-    WaterLayerFix.Refresh(EnvMan.instance);
+    if (EnvMan.instance)
+      ScaleGlobalWaterSurface.Refresh(EnvMan.instance);
     if (Configuration.RegenerateMap) Map();
   }
   public static void Map()
