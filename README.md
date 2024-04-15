@@ -32,6 +32,8 @@ Note: If the game fails to place the spawn altar (for example if no Meadows), th
 
 The minimap size must be manually changed because there are two different settings. Both of the settings increase the minimap size but have a different drawback. `Minimap size` significantly increases the minimap generation time while `Minimap pixel size` makes the minimap less detailed.
 
+The game caches the minimap which helps with the loading times.
+
 Recommended settings:
 
 - 20000 radius: 2 size, 1 pixel.
