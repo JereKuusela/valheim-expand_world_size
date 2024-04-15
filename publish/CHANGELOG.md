@@ -1,3 +1,6 @@
+- v1.15
+  - Fixed for the new game version.
+
 - v1.14
   - Adds support for setting world edge size to Better Continents.
   - Fixes one null reference error.
