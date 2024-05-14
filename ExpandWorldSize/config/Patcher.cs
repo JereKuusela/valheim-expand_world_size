@@ -38,7 +38,7 @@ public static class Patcher
     var method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight));
     var patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.GetBiomeHeight));
     harmony.Unpatch(method, patch);
-    method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), new[] { typeof(float), typeof(float) });
+    method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), [typeof(float), typeof(float), typeof(float), typeof(bool)]);
     patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.GetBiome));
     harmony.Unpatch(method, patch);
     method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.AddRivers));
