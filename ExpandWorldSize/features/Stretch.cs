@@ -87,4 +87,31 @@ public class Stretch
     return matcher.InstructionEnumeration();
   }
 
+  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.CreateAshlandsGap)), HarmonyTranspiler]
+  static IEnumerable<CodeInstruction> TranspilerCreateAshlandsGap(IEnumerable<CodeInstruction> instructions)
+  {
+    if (Patcher.IsMenu) return instructions;
+    CodeMatcher matcher = new(instructions);
+    matcher = Helper.Replace(matcher, 400d, 0.04 * Configuration.StrechedWorldRadius);
+    return matcher.InstructionEnumeration();
+  }
+
+  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.CreateDeepNorthGap)), HarmonyTranspiler]
+  static IEnumerable<CodeInstruction> TranspilerCreateDeepNorthGap(IEnumerable<CodeInstruction> instructions)
+  {
+    if (Patcher.IsMenu) return instructions;
+    CodeMatcher matcher = new(instructions);
+    matcher = Helper.Replace(matcher, 4000f, 0.4f * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 12000d, 1.2f * Configuration.StrechedWorldRadius);
+    matcher = Helper.Replace(matcher, 400d, 0.04 * Configuration.StrechedWorldRadius);
+    return matcher.InstructionEnumeration();
+  }
+  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight)), HarmonyTranspiler]
+  static IEnumerable<CodeInstruction> TranspilerGetBiomeHeight(IEnumerable<CodeInstruction> instructions)
+  {
+    if (Patcher.IsMenu) return instructions;
+    CodeMatcher matcher = new(instructions);
+    matcher = Helper.Replace(matcher, 10500f, Configuration.StrechedWorldTotalRadius);
+    return matcher.InstructionEnumeration();
+  }
 }

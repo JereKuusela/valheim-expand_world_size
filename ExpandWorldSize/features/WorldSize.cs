@@ -31,6 +31,19 @@ public class EdgeOfWorldKill
 }
 
 
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetAshlandsHeight))]
+public class GetAshlandsHeight
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
+    if (Patcher.IsMenu) return instructions;
+    CodeMatcher matcher = new(instructions);
+    // Incoming coordinates are stretched, so all limits must be stretched as well.
+    matcher = Helper.Replace(matcher, 10150d, (Configuration.WorldTotalRadius + 150f) / Configuration.WorldStretch);
+    return matcher.InstructionEnumeration();
+  }
+}
+
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBaseHeight))]
 public class GetBaseHeight
 {

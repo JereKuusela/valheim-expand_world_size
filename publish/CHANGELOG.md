@@ -1,3 +1,6 @@
+- v1.17
+  - Further fixed for the new game version.
+
 - v1.16
   - Fixed for the new game version.
 
