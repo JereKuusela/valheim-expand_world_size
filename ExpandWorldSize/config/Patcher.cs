@@ -1,4 +1,5 @@
 using HarmonyLib;
+using UnityEngine;
 
 namespace ExpandWorldSize;
 
@@ -37,6 +38,12 @@ public static class Patcher
     if (!IsMenu && Configuration.WorldStretch != 1f) return;
     var method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight));
     var patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.GetBiomeHeight));
+    harmony.Unpatch(method, patch);
+    method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.GetAshlandsOceanGradient), [typeof(Vector3)]);
+    patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.GetAshlandsOceanGradient));
+    harmony.Unpatch(method, patch);
+    method = AccessTools.Method(typeof(Minimap), nameof(Minimap.GetMaskColor));
+    patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.GetMaskColor));
     harmony.Unpatch(method, patch);
     method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), [typeof(float), typeof(float), typeof(float), typeof(bool)]);
     patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.GetBiome));

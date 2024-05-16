@@ -1,3 +1,6 @@
+- v1.18
+  - Fixes the world stretch not correctly affecting the burning ocean.
+
 - v1.17
   - Further fixed for the new game version.
 
