@@ -99,7 +99,7 @@ public class MapGeneration
     }
     if (BetterContinents.IsEnabled())
     {
-      EWS.Log.LogInfo($"Better Contintents enabled, skipping map generation.");
+      EWS.Log.LogInfo($"Better Continents enabled, skipping map generation.");
       return true;
     }
     Game.instance.StartCoroutine(Coroutine(__instance));

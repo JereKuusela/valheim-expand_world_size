@@ -10,6 +10,7 @@ public class BetterContinents
   private static Assembly? Assembly;
   private static FieldInfo? SettingsField;
   private static FieldInfo? IsEnabledField;
+  private static MethodInfo? SetSizeMethod;
   private static FieldInfo? WorldSizeField;
   private static FieldInfo? EdgeSizeField;
   public static void Run()
@@ -25,10 +26,16 @@ public class BetterContinents
     if (IsEnabledField == null) return;
     type = Assembly.GetType("BetterContinents.BetterContinents");
     if (type == null) return;
+    SetSizeMethod = AccessTools.Method(type, "SetSize");
+    if (SetSizeMethod != null)
+    {
+      EWS.Log.LogInfo("\"Better Continents\" detected. Applying compatibility.");
+      return;
+    }
     WorldSizeField = AccessTools.Field(type, "WorldSize");
-    if (WorldSizeField == null) return;
     EdgeSizeField = AccessTools.Field(type, "EdgeSize");
-    EWS.Log.LogInfo("\"Better Continents\" detected. Applying compatibility.");
+    if (EdgeSizeField != null && SetSizeMethod != null)
+      EWS.Log.LogInfo("Older \"Better Continents\" detected. Applying compatibility.");
   }
 
   public static bool IsEnabled()
@@ -41,9 +48,8 @@ public class BetterContinents
   }
   public static void RefreshSize()
   {
-    if (WorldSizeField == null) return;
-    WorldSizeField.SetValue(null, Configuration.WorldTotalRadius);
-    if (EdgeSizeField == null) return;
-    EdgeSizeField.SetValue(null, Configuration.WorldEdgeSize);
+    SetSizeMethod?.Invoke(null, [Configuration.WorldRadius, Configuration.WorldEdgeSize]);
+    WorldSizeField?.SetValue(null, Configuration.WorldTotalRadius);
+    EdgeSizeField?.SetValue(null, Configuration.WorldEdgeSize);
   }
 }
