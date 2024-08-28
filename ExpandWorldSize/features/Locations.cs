@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using HarmonyLib;
 using UnityEngine;
 
 namespace ExpandWorldSize;
 
 // Patches here are not critical because called once per location entry (not on each attempt).
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocations), typeof(ZoneSystem.ZoneLocation))]
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocationsTimeSliced), typeof(ZoneSystem.ZoneLocation), typeof(Stopwatch), typeof(ZPackage))]
 public class GenerateLocationsQuantity
 {
   static void Prefix(ZoneSystem.ZoneLocation location, ref int __state)
@@ -20,7 +22,7 @@ public class GenerateLocationsQuantity
     location.m_quantity = __state;
   }
 }
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocations), typeof(ZoneSystem.ZoneLocation))]
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocationsTimeSliced), typeof(ZoneSystem.ZoneLocation), typeof(Stopwatch), typeof(ZPackage))]
 public class GenerateLocationsMin
 {
   static void Prefix(ZoneSystem.ZoneLocation location, ref float __state)
@@ -33,7 +35,7 @@ public class GenerateLocationsMin
     location.m_minDistance = __state;
   }
 }
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocations), typeof(ZoneSystem.ZoneLocation))]
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocationsTimeSliced), typeof(ZoneSystem.ZoneLocation), typeof(Stopwatch), typeof(ZPackage))]
 public class GenerateLocationsMax
 {
   static void Prefix(ZoneSystem.ZoneLocation location, ref float __state)
@@ -57,10 +59,11 @@ public class GetRandomZone
     return matcher.InstructionEnumeration();
   }
 }
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocations), typeof(ZoneSystem.ZoneLocation))]
+[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocationsTimeSliced), typeof(ZoneSystem.ZoneLocation), typeof(Stopwatch), typeof(ZPackage))]
+[HarmonyPatch(MethodType.Enumerator)]
 public class GenerateLocations
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  static IEnumerable<CodeInstruction> TranspiTranspileMoveNextler(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);

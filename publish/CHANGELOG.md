@@ -1,5 +1,6 @@
 - v1.19
   - Improves compatiblity with Better Continents.
+  - Fixed for the new update.
 
 - v1.18
   - Fixes the world stretch not correctly affecting the burning ocean.
