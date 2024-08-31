@@ -1,3 +1,6 @@
+- v1.20
+  - Fixes location generation not working past the original world size.
+
 - v1.19
   - Improves compatiblity with Better Continents.
   - Fixed for the new update.

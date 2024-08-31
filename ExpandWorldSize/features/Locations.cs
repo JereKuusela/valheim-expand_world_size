@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using HarmonyLib;
@@ -6,46 +5,51 @@ using UnityEngine;
 
 namespace ExpandWorldSize;
 
-// Patches here are not critical because called once per location entry (not on each attempt).
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocationsTimeSliced), typeof(ZoneSystem.ZoneLocation), typeof(Stopwatch), typeof(ZPackage))]
-public class GenerateLocationsQuantity
+[HarmonyPatch(typeof(LoadingIndicator), nameof(LoadingIndicator.SetProgressVisibility))]
+public class ModifyLocations
 {
-  static void Prefix(ZoneSystem.ZoneLocation location, ref int __state)
+  private static readonly Dictionary<ZoneSystem.ZoneLocation, int> OriginalQuantities = [];
+  private static readonly Dictionary<ZoneSystem.ZoneLocation, float> OriginalMin = [];
+  private static readonly Dictionary<ZoneSystem.ZoneLocation, float> OriginalMax = [];
+
+  static void Prefix(bool visible)
   {
-    __state = location.m_quantity;
-    if (Configuration.LocationsMultiplier == 1f) return;
-    if (location.m_prefabName == Game.instance.m_StartLocation) return;
-    location.m_quantity = Mathf.RoundToInt(location.m_quantity * Configuration.LocationsMultiplier);
+    if (!visible) return;
+    if (Configuration.LocationsMultiplier != 1f)
+    {
+      foreach (var location in ZoneSystem.instance.m_locations)
+      {
+        if (location.m_prefabName == Game.instance.m_StartLocation) continue;
+        OriginalQuantities[location] = location.m_quantity;
+        location.m_quantity = Mathf.RoundToInt(location.m_quantity * Configuration.LocationsMultiplier);
+      }
+    }
+    if (Configuration.WorldRadius != 10000f)
+    {
+      foreach (var location in ZoneSystem.instance.m_locations)
+      {
+        OriginalMin[location] = location.m_minDistance;
+        OriginalMax[location] = location.m_maxDistance;
+        location.m_minDistance *= Configuration.WorldRadius / 10000f;
+        location.m_maxDistance *= Configuration.WorldRadius / 10000f;
+      }
+    }
   }
-  static void Postfix(ZoneSystem.ZoneLocation location, int __state)
+  static void Postfix(bool visible)
   {
-    location.m_quantity = __state;
-  }
-}
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocationsTimeSliced), typeof(ZoneSystem.ZoneLocation), typeof(Stopwatch), typeof(ZPackage))]
-public class GenerateLocationsMin
-{
-  static void Prefix(ZoneSystem.ZoneLocation location, ref float __state)
-  {
-    __state = location.m_minDistance;
-    location.m_minDistance *= Configuration.WorldRadius / 10000f;
-  }
-  static void Postfix(ZoneSystem.ZoneLocation location, float __state)
-  {
-    location.m_minDistance = __state;
-  }
-}
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocationsTimeSliced), typeof(ZoneSystem.ZoneLocation), typeof(Stopwatch), typeof(ZPackage))]
-public class GenerateLocationsMax
-{
-  static void Prefix(ZoneSystem.ZoneLocation location, ref float __state)
-  {
-    __state = location.m_maxDistance;
-    location.m_maxDistance *= Configuration.WorldRadius / 10000f;
-  }
-  static void Postfix(ZoneSystem.ZoneLocation location, float __state)
-  {
-    location.m_maxDistance = __state;
+    if (visible) return;
+    foreach (var location in ZoneSystem.instance.m_locations)
+    {
+      if (OriginalQuantities.TryGetValue(location, out var quantity))
+        location.m_quantity = quantity;
+      if (OriginalMin.TryGetValue(location, out var min))
+        location.m_minDistance = min;
+      if (OriginalMax.TryGetValue(location, out var max))
+        location.m_maxDistance = max;
+    }
+    OriginalQuantities.Clear();
+    OriginalMin.Clear();
+    OriginalMax.Clear();
   }
 }
 
@@ -63,7 +67,8 @@ public class GetRandomZone
 [HarmonyPatch(MethodType.Enumerator)]
 public class GenerateLocations
 {
-  static IEnumerable<CodeInstruction> TranspiTranspileMoveNextler(IEnumerable<CodeInstruction> instructions)
+  [HarmonyTranspiler]
+  static IEnumerable<CodeInstruction> TranspileMoveNext(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
