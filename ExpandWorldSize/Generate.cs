@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using HarmonyLib;
+using Service;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -99,7 +100,7 @@ public class MapGeneration
     }
     if (BetterContinents.IsEnabled())
     {
-      EWS.Log.LogInfo($"Better Continents enabled, skipping map generation.");
+      Log.Info($"Better Continents enabled, skipping map generation.");
       return true;
     }
     Game.instance.StartCoroutine(Coroutine(__instance));
@@ -109,7 +110,7 @@ public class MapGeneration
   {
     if (CTS != null)
     {
-      EWS.Log.LogInfo($"Cancelling previous map generation.");
+      Log.Info($"Cancelling previous map generation.");
       CTS.Cancel();
       CTS = null;
     }
@@ -152,7 +153,7 @@ public class MapGeneration
   {
     Cancel();
 
-    EWS.Log.LogInfo($"Starting map generation.");
+    Log.Info($"Starting map generation.");
     Stopwatch stopwatch = Stopwatch.StartNew();
     Minimap.DeleteMapTextureData(ZNet.World.m_name);
 
@@ -172,7 +173,7 @@ public class MapGeneration
       yield return null;
 
     if (task.IsFaulted)
-      EWS.Log.LogError($"Map generation failed!\n{task.Exception}");
+      Log.Error($"Map generation failed!\n{task.Exception}");
     else if (!ct.IsCancellationRequested)
     {
       map.m_mapTexture.SetPixels32(mapTexture);
@@ -196,7 +197,7 @@ public class MapGeneration
       Texture2D cached = new(map.m_textureSize, map.m_textureSize);
       cached.SetPixels32(cachedTexture);
       cached.Apply();
-      EWS.Log.LogInfo($"Map generation finished ({stopwatch.Elapsed.TotalSeconds:F0} seconds).");
+      Log.Info($"Map generation finished ({stopwatch.Elapsed.TotalSeconds:F0} seconds).");
       map.SaveMapTextureDataToDisk(map.m_forestMaskTexture, map.m_mapTexture, cached);
     }
     stopwatch.Stop();
@@ -231,7 +232,7 @@ public class MapGeneration
                 var wy = (i - halfTextureSize) * pixelSize + halfPixelSize;
                 while (Marketplace.IsLoading())
                 {
-                  EWS.Log.LogInfo("Waiting 100 ms for Marketplace to load...");
+                  Log.Info("Waiting 100 ms for Marketplace to load...");
                   Thread.Sleep(100);
                 }
                 var biome = wg.GetBiome(wx, wy);

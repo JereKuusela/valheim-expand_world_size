@@ -1,6 +1,7 @@
 using System.Reflection;
 using BepInEx.Bootstrap;
 using HarmonyLib;
+using Service;
 
 namespace ExpandWorldSize;
 
@@ -29,13 +30,13 @@ public class BetterContinents
     SetSizeMethod = AccessTools.Method(type, "SetSize");
     if (SetSizeMethod != null)
     {
-      EWS.Log.LogInfo("\"Better Continents\" detected. Applying compatibility.");
+      Log.Info("\"Better Continents\" detected. Applying compatibility.");
       return;
     }
     WorldSizeField = AccessTools.Field(type, "WorldSize");
     EdgeSizeField = AccessTools.Field(type, "EdgeSize");
     if (EdgeSizeField != null && SetSizeMethod != null)
-      EWS.Log.LogInfo("Older \"Better Continents\" detected. Applying compatibility.");
+      Log.Info("Older \"Better Continents\" detected. Applying compatibility.");
   }
 
   public static bool IsEnabled()

@@ -1,4 +1,5 @@
 using HarmonyLib;
+using Service;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -27,7 +28,7 @@ public class WorldInfo
   public static void Generate()
   {
     if (Patcher.IsMenu) return;
-    EWS.Log.LogInfo("Regenerating the world.");
+    Log.Info("Regenerating the world.");
     Refresh();
     MapGeneration.Cancel();
     WorldGenerator.instance.Pregenerate();

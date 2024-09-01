@@ -1,6 +1,7 @@
 using System.Reflection;
 using BepInEx.Bootstrap;
 using HarmonyLib;
+using Service;
 
 namespace ExpandWorldSize;
 
@@ -17,7 +18,7 @@ public class EWD
     if (type == null) return;
     SetSize = AccessTools.Method(type, "Set");
     if (SetSize == null) return;
-    EWS.Log.LogInfo("\"Expand World Data\" detected. Applying compatibility.");
+    Log.Info("\"Expand World Data\" detected. Applying compatibility.");
   }
 
   public static void RefreshSize()

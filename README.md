@@ -65,6 +65,16 @@ The final water depth can be multiplied with `Water depth multiplier`.
 
 Amount of forest can be changed with `Forest multiplier`.
 
+## Ashlands & Deep North
+
+Ashlands and Deep North have special terrain features that can be modified in the config.
+
+Terrain is lowered before Ashland and Deep North to make Ocean appear. This can be disabled with settings "Ashlands gap" and "Deep North gap".
+
+Ashlands terrain is limited by the position. This can be fully disabled with setting ""Restrict Ashlands position" or modified with settings "Ashlands length restriction" and "Ashlands width restriction".
+
+Note: The same settings exist in Expand World Data mod. Only change these settings in one of the mods.
+
 ## Seeds
 
 The layout of the world is [pre-determined](https://www.reddit.com/r/valheim/comments/qere7a/the_world_map/), and each world is just a snapshot of it.

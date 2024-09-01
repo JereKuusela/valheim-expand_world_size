@@ -1,4 +1,5 @@
 using BepInEx.Configuration;
+using HarmonyLib;
 using Service;
 using UnityEngine;
 
@@ -10,31 +11,31 @@ public partial class Configuration
   public static ConfigEntry<bool> configRegenerateMap;
   public static bool RegenerateMap => configRegenerateMap.Value;
   public static ConfigEntry<string> configWorldRadius;
-  public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius] ?? 10000f;
+  public static float WorldRadius => ConfigWrapper.Floats[configWorldRadius];
   public static float StrechedWorldRadius => WorldRadius / WorldStretch;
   public static ConfigEntry<string> configWorldEdgeSize;
-  public static float WorldEdgeSize => ConfigWrapper.Floats[configWorldEdgeSize] ?? 500f;
+  public static float WorldEdgeSize => ConfigWrapper.Floats[configWorldEdgeSize];
   public static float WorldTotalRadius => WorldRadius + WorldEdgeSize;
   public static float StrechedWorldTotalRadius => WorldTotalRadius / WorldStretch;
   public static ConfigEntry<string> configMapSize;
-  public static float MapSize => ConfigWrapper.Floats[configMapSize] ?? 1f;
+  public static float MapSize => ConfigWrapper.Floats[configMapSize];
   public static ConfigEntry<string> configMapPixelSize;
-  public static float MapPixelSize => ConfigWrapper.Floats[configMapPixelSize] ?? 1f;
+  public static float MapPixelSize => ConfigWrapper.Floats[configMapPixelSize];
 
   public static ConfigEntry<string> configAltitudeMultiplier;
-  public static float AltitudeMultiplier => ConfigWrapper.Floats[configAltitudeMultiplier] ?? 1f;
+  public static float AltitudeMultiplier => ConfigWrapper.Floats[configAltitudeMultiplier];
   public static ConfigEntry<string> configAltitudeDelta;
-  public static float AltitudeDelta => ConfigWrapper.Floats[configAltitudeDelta] ?? 0f;
+  public static float AltitudeDelta => ConfigWrapper.Floats[configAltitudeDelta];
 
   public static ConfigEntry<string> configLocationsMultiplier;
-  public static float LocationsMultiplier => ConfigWrapper.Floats[configLocationsMultiplier] ?? 1f;
+  public static float LocationsMultiplier => ConfigWrapper.Floats[configLocationsMultiplier];
 
   public static ConfigEntry<string> configForestMultiplier;
-  public static float ForestMultiplier => ConfigWrapper.Floats[configForestMultiplier] ?? 1f;
+  public static float ForestMultiplier => ConfigWrapper.Floats[configForestMultiplier];
   public static ConfigEntry<string> configWorldStretch;
   public static ConfigEntry<string> configBiomeStretch;
-  public static float WorldStretch => ConfigWrapper.Floats[configWorldStretch] ?? 1f;
-  public static float BiomeStretch => ConfigWrapper.Floats[configBiomeStretch] ?? 1f;
+  public static float WorldStretch => ConfigWrapper.Floats[configWorldStretch];
+  public static float BiomeStretch => ConfigWrapper.Floats[configBiomeStretch];
 
 
   public static ConfigEntry<string> configSeed;
@@ -47,7 +48,19 @@ public partial class Configuration
   public static ConfigEntry<string> configHeightSeed;
   public static float? HeightSeed => ConfigWrapper.Floats[configHeightSeed];
   public static ConfigEntry<string> configWaterDepthMultiplier;
-  public static float WaterDepthMultiplier => ConfigWrapper.Floats[configWaterDepthMultiplier] ?? 0;
+  public static float WaterDepthMultiplier => ConfigWrapper.Floats[configWaterDepthMultiplier];
+
+  public static ConfigEntry<string> configAshlandsWidthRestriction;
+  public static double AshlandsWidthRestriction => RestrictAshlands ? ConfigWrapper.Floats[configAshlandsWidthRestriction] : double.PositiveInfinity;
+  public static ConfigEntry<string> configAshlandsLengthRestriction;
+  public static double AshlandsLengthRestriction => RestrictAshlands ? ConfigWrapper.Floats[configAshlandsLengthRestriction] : double.PositiveInfinity;
+
+  public static ConfigEntry<bool> configRestrictAshlands;
+  public static bool RestrictAshlands => configRestrictAshlands.Value;
+  public static ConfigEntry<bool> configAshlandsGap;
+  public static bool AshlandsGap => configAshlandsGap.Value;
+  public static ConfigEntry<bool> configDeepNorthGap;
+  public static bool DeepNorthGap => configDeepNorthGap.Value;
 #nullable enable
   public static void Init(ConfigWrapper wrapper)
   {
@@ -100,5 +113,53 @@ public partial class Configuration
       WorldInfo.Generate();
     };
     configHeightSeed = wrapper.BindFloat(section, "Height variation seed", null, true);
+
+
+    section = "2. Poles";
+    configRestrictAshlands = wrapper.Bind(section, "Restrict Ashlands position", true, false, "If true, restricts Ashlands biome position.");
+    configRestrictAshlands.SettingChanged += (s, e) => HandleRestrictAshlandsPosition();
+    configAshlandsWidthRestriction = wrapper.BindFloat(section, "Ashlands width restriction", 7500f, false, "How wide is the Ashlands biome (meters).");
+    configAshlandsWidthRestriction.SettingChanged += (s, e) => HandleRestrictAshlandsPosition();
+    configAshlandsLengthRestriction = wrapper.BindFloat(section, "Ashlands length restriction", 1000f, false, "How long/deep is the Ashlands biome (meters).");
+    configAshlandsLengthRestriction.SettingChanged += (s, e) => HandleRestrictAshlandsPosition();
+    configAshlandsGap = wrapper.Bind(section, "Ashlands gap", true, false, "If true, Ashlands biome has an Ocean gap above it.");
+    configAshlandsGap.SettingChanged += (s, e) => HandleAshlandsGap();
+    configDeepNorthGap = wrapper.Bind(section, "Deep North gap", true, false, "If true, Deep North biome has an Ocean gap below it.");
+    configDeepNorthGap.SettingChanged += (s, e) => HandleDeepNorthGap();
+  }
+
+  public static void HandleRestrictAshlandsPosition()
+  {
+    if (WorldGenerator.instance == null) return;
+    if (GetAshlandsHeight.Patch(EWS.Harmony, AshlandsWidthRestriction, AshlandsLengthRestriction))
+      EWS.Instance.InvokeRegenerate();
+  }
+  public static void HandleAshlandsGap()
+  {
+    if (WorldGenerator.instance == null) return;
+    if (CreateAshlandsGap.Patch(EWS.Harmony, !AshlandsGap))
+      EWS.Instance.InvokeRegenerate();
+  }
+  public static void HandleDeepNorthGap()
+  {
+    if (WorldGenerator.instance == null) return;
+    if (CreateDeepNorthGap.Patch(EWS.Harmony, !DeepNorthGap))
+      EWS.Instance.InvokeRegenerate();
+  }
+}
+
+[HarmonyPatch(typeof(ZNet))]
+public class ZNetPatch
+{
+  // When the world is set on the server (applies to single player as well), we should select the correct loaded settings
+  [HarmonyPrefix, HarmonyPatch(nameof(ZNet.SetServer))]
+  private static void SetServerPrefix(bool server, World world)
+  {
+    if (server)
+    {
+      Configuration.HandleAshlandsGap();
+      Configuration.HandleDeepNorthGap();
+      Configuration.HandleRestrictAshlandsPosition();
+    }
   }
 }

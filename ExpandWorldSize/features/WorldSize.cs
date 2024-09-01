@@ -30,9 +30,8 @@ public class EdgeOfWorldKill
   static bool Prefix(Player __instance) => __instance.transform.position.y < 4000f;
 }
 
-
 [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetAshlandsHeight))]
-public class GetAshlandsHeight
+public class GetAshlandsHeightSize
 {
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {

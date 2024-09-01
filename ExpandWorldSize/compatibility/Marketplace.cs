@@ -1,6 +1,7 @@
 using System.Reflection;
 using BepInEx.Bootstrap;
 using HarmonyLib;
+using Service;
 
 namespace ExpandWorldSize;
 
@@ -17,7 +18,7 @@ public class Marketplace
     if (type == null) return;
     IsLoadingField = AccessTools.Field(type, "FillingTerritoryData");
     if (IsLoadingField == null) return;
-    EWS.Log.LogInfo("\"Marketplace\" detected. Applying compatibility.");
+    Log.Info("\"Marketplace\" detected. Applying compatibility.");
   }
 
   public static bool IsLoading()
