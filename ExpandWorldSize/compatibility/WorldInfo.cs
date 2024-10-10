@@ -54,7 +54,7 @@ public class WorldInfo
     BiomeStretch = Configuration.BiomeStretch;
     WaterDepth = Configuration.WaterDepthMultiplier;
     AltitudeMultiplier = Configuration.AltitudeMultiplier;
-    ForestMultiplier = Configuration.ForestMultiplier;
+    ForestMultiplier = Configuration.ForestMultiplier == 0 ? 1f : Configuration.ForestMultiplier;
     BaseAltitudeDelta = Helper.HeightToBaseHeight(Configuration.AltitudeDelta);
     if (Patcher.WG != null)
       Patcher.WG.maxMarshDistance = VersionSetup.MaxMarshDistance * Configuration.WorldRadius / 10000f / Configuration.WorldStretch;

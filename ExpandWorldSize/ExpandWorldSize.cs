@@ -14,7 +14,6 @@ public class EWS : BaseUnityPlugin
   public const string VERSION = "1.21";
 #nullable disable
   public static EWS Instance;
-  public static Harmony Harmony;
 #nullable enable
   public static ServerSync.ConfigSync ConfigSync = new(GUID)
   {
@@ -27,12 +26,14 @@ public class EWS : BaseUnityPlugin
   public static bool NeedsMigration = File.Exists(Path.Combine(Paths.ConfigPath, "expand_world.cfg")) && !File.Exists(Path.Combine(Paths.ConfigPath, ConfigName));
   public void Awake()
   {
+    Log.Init(Logger);
     Instance = this;
     ConfigWrapper wrapper = new(Config, ConfigSync, InvokeRegenerate);
     Configuration.Init(wrapper);
-    Harmony = new(GUID);
-    Patcher.Init(Harmony);
-    Log.Init(Logger);
+    // Two patchers are needed until all patches are properly dynamic.
+    Harmony harmony = new(GUID);
+    Harmony dynamicHarmony = new(GUID + ".dynamic");
+    Patcher.Init(harmony, dynamicHarmony);
     try
     {
       SetupWatcher();

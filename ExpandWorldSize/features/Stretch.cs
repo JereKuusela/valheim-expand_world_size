@@ -9,24 +9,24 @@ namespace ExpandWorldSize;
 [HarmonyPatch]
 public class Stretch
 {
-  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetAshlandsOceanGradient), typeof(Vector3)), HarmonyPrefix, HarmonyPriority(Priority.HigherThanNormal)]
+  [HarmonyPriority(Priority.HigherThanNormal)]
   public static void GetAshlandsOceanGradient(ref Vector3 pos)
   {
     pos = pos with { x = pos.x / Configuration.WorldStretch, z = pos.z / Configuration.WorldStretch };
   }
-  [HarmonyPatch(typeof(Minimap), nameof(Minimap.GetMaskColor)), HarmonyPrefix, HarmonyPriority(Priority.HigherThanNormal)]
+  [HarmonyPriority(Priority.HigherThanNormal)]
   public static void GetMaskColor(ref float wx, ref float wy)
   {
     wx /= Configuration.WorldStretch;
     wy /= Configuration.WorldStretch;
   }
-  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight)), HarmonyPrefix, HarmonyPriority(Priority.HigherThanNormal)]
+  [HarmonyPriority(Priority.HigherThanNormal)]
   public static void GetBiomeHeight(ref float wx, ref float wy)
   {
     wx /= Configuration.WorldStretch;
     wy /= Configuration.WorldStretch;
   }
-  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), typeof(float), typeof(float), typeof(float), typeof(bool)), HarmonyPrefix, HarmonyPriority(Priority.HigherThanNormal)]
+  [HarmonyPriority(Priority.HigherThanNormal)]
   public static void GetBiome(ref float wx, ref float wy)
   {
     // Stretch should "slow down" both GetBaseHeight and PerlinNoise.

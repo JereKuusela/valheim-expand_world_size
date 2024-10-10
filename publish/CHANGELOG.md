@@ -1,5 +1,6 @@
 - v1.21
   - Adds new settings "Restrict Ashlands", "Ashlands width restriction", "Ashlands length restriction", "Ashlands gap" and "Deep North gap".
+  - Changes water to extend below coordinate zero (up to 200 meters water depth).
 
 - v1.20
   - Fixes location generation not working past the original world size.

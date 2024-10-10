@@ -51,7 +51,6 @@ public class FindStreamStartPoint
     return matcher.InstructionEnumeration();
   }
 }
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.AddRivers))]
 public class AddRivers
 {
   // Incoming coordinates are stretched, so they must be unstreched for the river database.
