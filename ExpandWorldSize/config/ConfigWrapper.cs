@@ -19,20 +19,21 @@ public class ConfigWrapper
     Regenerate = regenerate;
   }
   public static Dictionary<ConfigEntry<string>, float> Floats = [];
+  public static Dictionary<ConfigEntry<string>, float?> NullFloats = [];
   public static Dictionary<ConfigEntry<string>, int> Ints = [];
 
   public ConfigEntry<string> BindFloat(string group, string name, float value, bool regenerate, string description = "", bool synchronizedSetting = true)
   {
     var entry = Bind(group, name, value.ToString(CultureInfo.InvariantCulture), regenerate, description, synchronizedSetting);
-    entry.SettingChanged += (s, e) => Floats[entry] = TryParseFloat(entry) ?? 1f;
-    Floats[entry] = TryParseFloat(entry) ?? 1f;
+    entry.SettingChanged += (s, e) => Floats[entry] = TryParseFloat(entry) ?? value;
+    Floats[entry] = TryParseFloat(entry) ?? value;
     return entry;
   }
   public ConfigEntry<string> BindFloat(string group, string name, float? value, bool regenerate, string description = "", bool synchronizedSetting = true)
   {
     var entry = Bind(group, name, value.HasValue ? value.Value.ToString(CultureInfo.InvariantCulture) : "", regenerate, description, synchronizedSetting);
-    entry.SettingChanged += (s, e) => Floats[entry] = TryParseFloat(entry) ?? 1f;
-    Floats[entry] = TryParseFloat(entry) ?? 1f;
+    entry.SettingChanged += (s, e) => NullFloats[entry] = TryParseFloat(entry);
+    NullFloats[entry] = TryParseFloat(entry);
     return entry;
   }
 

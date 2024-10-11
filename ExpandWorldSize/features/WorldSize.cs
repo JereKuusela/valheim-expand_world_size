@@ -80,13 +80,13 @@ public class SetupMaterial
   public static void Prefix(WaterVolume __instance)
   {
     __instance.m_waterSurface.material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
-    // Zone water should be at y 30, anything above that is dungeon water.
-    if (__instance.transform.position.y < 30.001f && __instance.m_collider is BoxCollider box)
+    // Zone water should be at y 30, anything above that is dungeon water and anything below is end of the world.
+    if (__instance.transform.position.y < 30.001f && __instance.transform.position.y > 29.999f && __instance.m_collider is BoxCollider box)
     {
-      // Default is -20 center with 30 size, probably 10 meters extra for waves.
+      // Default is -20 center with 60 size, probably 10 meters extra for waves.
       // -100 meters should give plenty of space for deeper water.
       box.center = new Vector3(0, -100, 0);
-      box.size = new Vector3(62, 220, 64);
+      box.size = new Vector3(64, 220, 64);
     }
   }
 }

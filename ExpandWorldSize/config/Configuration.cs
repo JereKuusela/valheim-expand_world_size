@@ -42,11 +42,11 @@ public partial class Configuration
   public static string Seed => configSeed.Value;
 
   public static ConfigEntry<string> configOffsetX;
-  public static float? OffsetX => ConfigWrapper.Floats[configOffsetX];
+  public static float? OffsetX => ConfigWrapper.NullFloats[configOffsetX];
   public static ConfigEntry<string> configOffsetY;
-  public static float? OffsetY => ConfigWrapper.Floats[configOffsetY];
+  public static float? OffsetY => ConfigWrapper.NullFloats[configOffsetY];
   public static ConfigEntry<string> configHeightSeed;
-  public static float? HeightSeed => ConfigWrapper.Floats[configHeightSeed];
+  public static float? HeightSeed => ConfigWrapper.NullFloats[configHeightSeed];
   public static ConfigEntry<string> configWaterDepthMultiplier;
   public static float WaterDepthMultiplier => ConfigWrapper.Floats[configWaterDepthMultiplier];
 

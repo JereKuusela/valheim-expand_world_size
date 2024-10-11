@@ -1,3 +1,9 @@
+- v1.23
+  - Fixes ships sometimes falling to the sea floor.
+
+- v1.22
+  - Fixes worlds breaking.
+
 - v1.21
   - Adds new settings "Restrict Ashlands", "Ashlands width restriction", "Ashlands length restriction", "Ashlands gap" and "Deep North gap".
   - Changes water to extend below coordinate zero (up to 200 meters water depth).
