@@ -27,8 +27,8 @@ public static class Patcher
     CheckWaterDepth(DynamicHarmony);
     CheckForest(DynamicHarmony);
     CheckAltitude(DynamicHarmony);
-    CreateAshlandsGap.Patch(DynamicHarmony, !Configuration.DeepNorthGap);
-    CreateDeepNorthGap.Patch(DynamicHarmony, Configuration.DeepNorthGap);
+    CreateAshlandsGap.Patch(DynamicHarmony, !Configuration.AshlandsGap);
+    CreateDeepNorthGap.Patch(DynamicHarmony, !Configuration.DeepNorthGap);
     GetAshlandsHeight.Patch(DynamicHarmony, Configuration.AshlandsWidthRestriction, Configuration.AshlandsLengthRestriction);
   }
 

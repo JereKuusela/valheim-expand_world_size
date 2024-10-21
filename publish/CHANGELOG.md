@@ -1,3 +1,6 @@
+- v1.24
+  - Fixes Ashland gap and Deep North gap settings not working.
+
 - v1.23
   - Fixes ships sometimes falling to the sea floor.
 
