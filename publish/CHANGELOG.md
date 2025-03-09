@@ -1,3 +1,6 @@
+- v1.25
+  - Fixed for the new update.
+
 - v1.24
   - Fixes Ashland gap and Deep North gap settings not working.
 
