@@ -5,13 +5,14 @@ using HarmonyLib;
 using Service;
 
 namespace ExpandWorldSize;
+
 [BepInPlugin(GUID, NAME, VERSION)]
 [BepInIncompatibility("expand_world")]
 public class EWS : BaseUnityPlugin
 {
   public const string GUID = "expand_world_size";
   public const string NAME = "Expand World Size";
-  public const string VERSION = "1.25";
+  public const string VERSION = "1.26";
 #nullable disable
   public static EWS Instance;
 #nullable enable

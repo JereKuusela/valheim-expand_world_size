@@ -4,6 +4,7 @@ using Service;
 using UnityEngine;
 
 namespace ExpandWorldSize;
+
 public partial class Configuration
 {
 #nullable disable
@@ -61,6 +62,10 @@ public partial class Configuration
   public static bool AshlandsGap => configAshlandsGap.Value;
   public static ConfigEntry<bool> configDeepNorthGap;
   public static bool DeepNorthGap => configDeepNorthGap.Value;
+  public static ConfigEntry<bool> configFixWaterColor;
+  public static bool FixWaterColor => configFixWaterColor.Value;
+  public static ConfigEntry<bool> configRemoveAshlandsWater;
+  public static bool RemoveAshlandsWater => configRemoveAshlandsWater.Value;
 #nullable enable
   public static void Init(ConfigWrapper wrapper)
   {
@@ -121,5 +126,7 @@ public partial class Configuration
     configAshlandsLengthRestriction = wrapper.BindFloat(section, "Ashlands length restriction", 1000f, true, "How long/deep is the Ashlands biome (meters).");
     configAshlandsGap = wrapper.Bind(section, "Ashlands gap", true, true, "If true, Ashlands biome has an Ocean gap above it.");
     configDeepNorthGap = wrapper.Bind(section, "Deep North gap", true, true, "If true, Deep North biome has an Ocean gap below it.");
+    configRemoveAshlandsWater = wrapper.Bind(section, "Remove Ashlands water", false, true, "If true, the red water color is completely removed.");
+    configFixWaterColor = wrapper.Bind(section, "Fix water color", true, true, "If true, fixes the water color to match the current biome.");
   }
 }

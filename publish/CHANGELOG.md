@@ -1,3 +1,7 @@
+- v1.26
+  - Adds a setting to remove the red Ashlands water. Thanks Badger!
+  - Adds a setting to dynamically update the water color when entering/exiting Ashlands biome.
+
 - v1.25
   - Fixed for the new update.
 

@@ -66,6 +66,16 @@ public class GetBaseHeight
   }
 }
 
+[HarmonyPatch(typeof(Player), nameof(Player.AddKnownBiome))]
+public class AddKnownBiome
+{
+  public static void Postfix()
+  {
+    if (!Configuration.FixWaterColor) return;
+    SetupMaterial.Refresh();
+    ScaleGlobalWaterSurface.Refresh(EnvMan.instance);
+  }
+}
 [HarmonyPatch(typeof(WaterVolume), nameof(WaterVolume.SetupMaterial))]
 public class SetupMaterial
 {
@@ -74,12 +84,13 @@ public class SetupMaterial
     var objects = Object.FindObjectsOfType<WaterVolume>();
     foreach (var water in objects)
     {
-      water.m_waterSurface.material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
+      water.m_waterSurface.sharedMaterial.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
+      FixColors(water.m_waterSurface.sharedMaterial);
     }
   }
   public static void Prefix(WaterVolume __instance)
   {
-    __instance.m_waterSurface.material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
+    __instance.m_waterSurface.sharedMaterial.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
     // Zone water should be at y 30, anything above that is dungeon water and anything below is end of the world.
     if (__instance.transform.position.y < 30.001f && __instance.transform.position.y > 29.999f && __instance.m_collider is BoxCollider box)
     {
@@ -88,7 +99,75 @@ public class SetupMaterial
       box.center = new Vector3(0, -100, 0);
       box.size = new Vector3(64, 220, 64);
     }
+    FixColors(__instance.m_waterSurface.sharedMaterial);
   }
+  public static void FixColors(Material mat)
+  {
+    InitColors(mat);
+    if (Configuration.FixWaterColor && Player.m_localPlayer)
+    {
+      var isAshlands = Player.m_localPlayer.GetCurrentBiome() == Heightmap.Biome.AshLands;
+      if (isAshlands)
+      {
+        mat.SetColor("_SurfaceColor", AshlandsSurface);
+        mat.SetColor("_AshlandsSurfaceColor", AshlandsSurface);
+        mat.SetColor("_ColorTop", AshlandsTop);
+        mat.SetColor("_AshlandsColorTop", AshlandsTop);
+        mat.SetColor("_ColorBottom", AshlandsBottom);
+        mat.SetColor("_AshlandsColorBottom", AshlandsBottom);
+        mat.SetColor("_ColorBottomShallow", AshlandsShallow);
+        mat.SetColor("_AshlandsColorBottomShallow", AshlandsShallow);
+
+      }
+      else
+      {
+        mat.SetColor("_SurfaceColor", WaterSurface);
+        mat.SetColor("_AshlandsSurfaceColor", WaterSurface);
+        mat.SetColor("_ColorTop", WaterTop);
+        mat.SetColor("_AshlandsColorTop", WaterTop);
+        mat.SetColor("_ColorBottom", WaterBottom);
+        mat.SetColor("_AshlandsColorBottom", WaterBottom);
+        mat.SetColor("_ColorBottomShallow", WaterShallow);
+        mat.SetColor("_AshlandsColorBottomShallow", WaterShallow);
+      }
+    }
+    else if (Configuration.RemoveAshlandsWater)
+    {
+      mat.SetColor("_AshlandsSurfaceColor", WaterSurface);
+      mat.SetColor("_AshlandsColorTop", WaterTop);
+      mat.SetColor("_AshlandsColorBottom", WaterBottom);
+      mat.SetColor("_AshlandsColorBottomShallow", WaterShallow);
+    }
+    else
+    {
+      mat.SetColor("_AshlandsSurfaceColor", AshlandsSurface);
+      mat.SetColor("_AshlandsColorTop", AshlandsTop);
+      mat.SetColor("_AshlandsColorBottom", AshlandsBottom);
+      mat.SetColor("_AshlandsColorBottomShallow", AshlandsShallow);
+    }
+  }
+  private static bool InitDone = false;
+  private static void InitColors(Material mat)
+  {
+    if (InitDone) return;
+    InitDone = true;
+    WaterSurface = mat.GetColor("_SurfaceColor");
+    AshlandsSurface = mat.GetColor("_AshlandsSurfaceColor");
+    WaterTop = mat.GetColor("_ColorTop");
+    AshlandsTop = mat.GetColor("_AshlandsColorTop");
+    WaterBottom = mat.GetColor("_ColorBottom");
+    AshlandsBottom = mat.GetColor("_AshlandsColorBottom");
+    WaterShallow = mat.GetColor("_ColorBottomShallow");
+    AshlandsShallow = mat.GetColor("_AshlandsColorBottomShallow");
+  }
+  private static Color WaterSurface;
+  private static Color AshlandsSurface;
+  private static Color WaterTop;
+  private static Color AshlandsTop;
+  private static Color WaterBottom;
+  private static Color AshlandsBottom;
+  private static Color WaterShallow;
+  private static Color AshlandsShallow;
 }
 
 [HarmonyPatch(typeof(EnvMan), nameof(EnvMan.Awake))]
@@ -97,7 +176,10 @@ public class ScaleGlobalWaterSurface
   public static void Refresh(EnvMan obj)
   {
     var water = obj.transform.Find("WaterPlane").Find("watersurface");
-    water.GetComponent<MeshRenderer>().material.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
+    if (!water) return;
+    var mat = water.GetComponent<MeshRenderer>().sharedMaterial;
+    mat.SetFloat("_WaterEdge", Configuration.WorldTotalRadius);
+    SetupMaterial.FixColors(mat);
   }
   public static void Postfix(EnvMan __instance) => Refresh(__instance);
 }

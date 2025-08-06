@@ -75,6 +75,14 @@ Ashlands terrain is limited by the position. This can be fully disabled with set
 
 Note: The same settings exist in Expand World Data mod. Only change these settings in one of the mods.
 
+## Ashlands water color
+
+Ashlands has a different water color than other biomes. Normally this is hardcoded which doesn't work when expanding the world size.
+
+Setting "Fix water color" is enabled by default. This makes the color automatically update based on the current biome. This setting should be disabled if some other mod like Expand World Data is also changing the water color.
+
+Setting "Remove Ashlands water" removes the red water completely. However the red Ashlands water still causes the water have a red tint on it. This setting should be more compatible with other mods and have a slightly better performance.
+
 ## Seeds
 
 The layout of the world is [pre-determined](https://www.reddit.com/r/valheim/comments/qere7a/the_world_map/), and each world is just a snapshot of it.
