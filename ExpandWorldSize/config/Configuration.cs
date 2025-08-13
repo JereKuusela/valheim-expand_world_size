@@ -126,7 +126,10 @@ public partial class Configuration
     configAshlandsLengthRestriction = wrapper.BindFloat(section, "Ashlands length restriction", 1000f, true, "How long/deep is the Ashlands biome (meters).");
     configAshlandsGap = wrapper.Bind(section, "Ashlands gap", true, true, "If true, Ashlands biome has an Ocean gap above it.");
     configDeepNorthGap = wrapper.Bind(section, "Deep North gap", true, true, "If true, Deep North biome has an Ocean gap below it.");
-    configRemoveAshlandsWater = wrapper.Bind(section, "Remove Ashlands water", false, true, "If true, the red water color is completely removed.");
-    configFixWaterColor = wrapper.Bind(section, "Fix water color", true, true, "If true, fixes the water color to match the current biome.");
+    configRemoveAshlandsWater = wrapper.Bind(section, "Remove Ashlands water", false, false, "If true, the red water color is completely removed.");
+    configRemoveAshlandsWater.SettingChanged += (s, e) => WaterColor.Regenerate();
+    configFixWaterColor = wrapper.Bind(section, "Fix water color", true, false, "If true, fixes the water color to match the current biome.");
+    configFixWaterColor.SettingChanged += (s, e) => WaterColor.Regenerate();
+    WaterColor.Regenerate();
   }
 }

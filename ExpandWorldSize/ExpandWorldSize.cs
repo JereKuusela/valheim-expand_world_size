@@ -3,6 +3,7 @@ using System.IO;
 using BepInEx;
 using HarmonyLib;
 using Service;
+using UnityEngine;
 
 namespace ExpandWorldSize;
 
@@ -12,7 +13,7 @@ public class EWS : BaseUnityPlugin
 {
   public const string GUID = "expand_world_size";
   public const string NAME = "Expand World Size";
-  public const string VERSION = "1.26";
+  public const string VERSION = "1.27";
 #nullable disable
   public static EWS Instance;
 #nullable enable
@@ -57,6 +58,12 @@ public class EWS : BaseUnityPlugin
     CancelInvoke("Regenerate");
     Invoke("Regenerate", 1.0f);
   }
+  public void LateUpdate()
+  {
+    if (Patcher.IsMenu) return;
+    WaterColor.Transition(Time.deltaTime);
+  }
+
   public void Regenerate() => WorldInfo.Generate();
 #pragma warning disable IDE0051
   private void OnDestroy()
