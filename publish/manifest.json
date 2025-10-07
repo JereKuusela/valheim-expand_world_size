@@ -1,9 +1,9 @@
 {
   "name": "Expand_World_Size",
-  "version_number": "1.27.0",
-  "website_url": "https://github.com/JereKuusela/valheim-expand_world_size",
+  "version_number": "1.28.0",
+  "website_url": "https://discord.gg/VFRJcPwUdm",
   "description": "Allows configuring the world size and altitude settings.",
   "dependencies": [
-    "denikson-BepInExPack_Valheim-5.4.2202"
+    "denikson-BepInExPack_Valheim-5.4.2333"
   ]
 }

@@ -70,6 +70,25 @@ public static class Patcher
     harmony.Unpatch(method, patch);
     if (worldStretch != 1f)
       harmony.Patch(method, prefix: new(patch));
+    PatchAshlandsDeepNorthChecks(harmony, worldStretch);
+  }
+  private static void PatchAshlandsDeepNorthChecks(Harmony harmony, float worldStretch)
+  {
+    var method = AccessTools.Method(typeof(Character), nameof(Character.UpdateLava));
+    var patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.StretchIsAshlandsTranspiler));
+    harmony.Unpatch(method, patch);
+    if (worldStretch != 1f)
+      harmony.Patch(method, transpiler: new(patch));
+    method = AccessTools.Method(typeof(EnvMan), nameof(EnvMan.GetBiome));
+    patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.StretchIsAshlandsDeepNorthTranspiler));
+    harmony.Unpatch(method, patch);
+    if (worldStretch != 1f)
+      harmony.Patch(method, transpiler: new(patch));
+    method = AccessTools.Method(typeof(EnvMan), nameof(EnvMan.UpdateEnvironment));
+    patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.StretchIsAshlandsDeepNorthTranspiler));
+    harmony.Unpatch(method, patch);
+    if (worldStretch != 1f)
+      harmony.Patch(method, transpiler: new(patch));
   }
   private static float PatchedWaterDepthMultiplier = 1f;
   private static float PatchedWaterLevel = 30f;

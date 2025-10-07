@@ -32,7 +32,7 @@ public class WorldInfo
     Refresh();
     MapGeneration.Cancel();
     WorldGenerator.instance.Pregenerate();
-    foreach (var heightmap in Object.FindObjectsOfType<Heightmap>())
+    foreach (var heightmap in Object.FindObjectsByType<Heightmap>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
     {
       heightmap.m_buildData = null;
       heightmap.Regenerate();

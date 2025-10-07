@@ -1,3 +1,6 @@
+- v1.28
+  - Fixes wrong weather when world stretch is used.
+
 - v1.27
   - Adds smoother transition to the "Fix water color" setting.
   - Optimizes the "Fix water color" setting.
@@ -11,9 +14,3 @@
 
 - v1.24
   - Fixes Ashland gap and Deep North gap settings not working.
-
-- v1.23
-  - Fixes ships sometimes falling to the sea floor.
-
-- v1.22
-  - Fixes worlds breaking.

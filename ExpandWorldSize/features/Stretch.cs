@@ -9,6 +9,43 @@ namespace ExpandWorldSize;
 [HarmonyPatch]
 public class Stretch
 {
+  public static IEnumerable<CodeInstruction> StretchIsAshlandsTranspiler(IEnumerable<CodeInstruction> instructions)
+  {
+    return new CodeMatcher(instructions)
+      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.IsAshlands))))
+      .MatchBack(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Vector3), nameof(Vector3.z))))
+      .Advance(1)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldc_R4, Configuration.WorldStretch))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Div))
+      .MatchBack(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Vector3), nameof(Vector3.x))))
+      .Advance(1)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldc_R4, Configuration.WorldStretch))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Div))
+      .InstructionEnumeration();
+  }
+  public static IEnumerable<CodeInstruction> StretchIsAshlandsDeepNorthTranspiler(IEnumerable<CodeInstruction> instructions)
+  {
+    return new CodeMatcher(instructions)
+      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.IsAshlands))))
+      .MatchBack(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Vector3), nameof(Vector3.z))))
+      .Advance(1)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldc_R4, Configuration.WorldStretch))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Div))
+      .MatchBack(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Vector3), nameof(Vector3.x))))
+      .Advance(1)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldc_R4, Configuration.WorldStretch))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Div))
+      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.IsDeepnorth))))
+      .MatchBack(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Vector3), nameof(Vector3.z))))
+      .Advance(1)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldc_R4, Configuration.WorldStretch))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Div))
+      .MatchBack(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Vector3), nameof(Vector3.x))))
+      .Advance(1)
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Ldc_R4, Configuration.WorldStretch))
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Div))
+      .InstructionEnumeration();
+  }
   [HarmonyPriority(Priority.HigherThanNormal)]
   public static void GetAshlandsOceanGradient(ref Vector3 pos)
   {
