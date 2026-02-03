@@ -47,7 +47,7 @@ public class Stretch
       .InstructionEnumeration();
   }
   [HarmonyPriority(Priority.HigherThanNormal)]
-  public static void GetAshlandsOceanGradient(ref Vector3 pos)
+  public static void StretchVector3(ref Vector3 pos)
   {
     pos = pos with { x = pos.x / Configuration.WorldStretch, z = pos.z / Configuration.WorldStretch };
   }

@@ -51,7 +51,7 @@ public static class Patcher
     if (worldStretch != 1f)
       harmony.Patch(method, prefix: new(patch));
     method = AccessTools.Method(typeof(WorldGenerator), nameof(WorldGenerator.GetAshlandsOceanGradient), [typeof(Vector3)]);
-    patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.GetAshlandsOceanGradient));
+    patch = AccessTools.Method(typeof(Stretch), nameof(Stretch.StretchVector3));
     harmony.Unpatch(method, patch);
     if (worldStretch != 1f)
       harmony.Patch(method, prefix: new(patch));
