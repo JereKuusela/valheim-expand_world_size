@@ -13,7 +13,7 @@ public class EWS : BaseUnityPlugin
 {
   public const string GUID = "expand_world_size";
   public const string NAME = "Expand World Size";
-  public const string VERSION = "1.28";
+  public const string VERSION = "1.29";// Version number change to reflect the correction.
 #nullable disable
   public static EWS Instance;
 #nullable enable

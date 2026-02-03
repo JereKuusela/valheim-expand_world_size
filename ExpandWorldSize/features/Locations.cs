@@ -5,16 +5,16 @@ using UnityEngine;
 
 namespace ExpandWorldSize;
 
-[HarmonyPatch(typeof(LoadingIndicator), nameof(LoadingIndicator.SetProgressVisibility))]
+[HarmonyPatch(typeof(LoadingIndicator), nameof(LoadingIndicator.SetShowProgress))] 
 public class ModifyLocations
 {
   private static readonly Dictionary<ZoneSystem.ZoneLocation, int> OriginalQuantities = [];
   private static readonly Dictionary<ZoneSystem.ZoneLocation, float> OriginalMin = [];
   private static readonly Dictionary<ZoneSystem.ZoneLocation, float> OriginalMax = [];
 
-  static void Prefix(bool visible)
-  {
-    if (!visible) return;
+    static void Prefix(bool show) // rename 'visible' to 'show' to match the game's new parameter name
+    {
+    if (!show) return;
     if (Configuration.LocationsMultiplier != 1f)
     {
       foreach (var location in ZoneSystem.instance.m_locations)
@@ -35,9 +35,9 @@ public class ModifyLocations
       }
     }
   }
-  static void Postfix(bool visible)
-  {
-    if (visible) return;
+  static void Postfix(bool show)//again... rename 'visible' to 'show' to match the game's new parameter name
+    {
+    if (show) return;
     foreach (var location in ZoneSystem.instance.m_locations)
     {
       if (OriginalQuantities.TryGetValue(location, out var quantity))
