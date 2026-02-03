@@ -1,6 +1,6 @@
 {
   "name": "Expand_World_Size",
-  "version_number": "1.28.0",
+  "version_number": "1.29.0",
   "website_url": "https://discord.gg/VFRJcPwUdm",
   "description": "Allows configuring the world size and altitude settings.",
   "dependencies": [

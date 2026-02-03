@@ -1,3 +1,7 @@
+- v1.29
+  - Fixed for the new update. Thanks Kurios.ZeuS!
+  - Updated DotNet from 4.8 to Standard 2.1.
+
 - v1.28
   - Fixes wrong weather when world stretch is used.
 
@@ -11,6 +15,3 @@
 
 - v1.25
   - Fixed for the new update.
-
-- v1.24
-  - Fixes Ashland gap and Deep North gap settings not working.

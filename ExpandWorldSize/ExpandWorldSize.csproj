@@ -20,29 +20,21 @@
     </Reference>
     <Reference Include="netstandard">
       <HintPath>..\..\Libs\netstandard.dll</HintPath>
-      <Private>false</Private>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>..\..\Libs\mscorlib.dll</HintPath>
-      <Private>false</Private>
     </Reference>
     <Reference Include="System">
       <HintPath>..\..\Libs\System.dll</HintPath>
-      <Private>false</Private>
     </Reference>
     <Reference Include="System.Core">
       <HintPath>..\..\Libs\System.Core.dll</HintPath>
-      <Private>True</Private>
     </Reference>
-
     <Reference Include="UnityEngine">
       <HintPath>..\..\Libs\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\Libs\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\..\Libs\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\Libs\UnityEngine.UI.dll</HintPath>
@@ -53,18 +45,11 @@
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\Libs\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\Libs\UnityEngine.TextRenderingModule.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>..\..\Libs\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="System.Core">
       <HintPath>..\..\Libs\System.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\Libs\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\..\Libs\BepInEx.dll</HintPath>
@@ -72,15 +57,14 @@
     <Reference Include="0Harmony">
       <HintPath>..\..\Libs\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="ServerSync">
-      <HintPath>..\..\Libs\ServerSync.dll</HintPath>
-    </Reference>
-
     <Reference Include="assembly_valheim">
       <HintPath>..\..\Libs\assembly_valheim.dll</HintPath>
     </Reference>
     <Reference Include="assembly_utils">
       <HintPath>..\..\Libs\assembly_utils.dll</HintPath>
+    </Reference>
+    <Reference Include="ServerSync">
+      <HintPath>..\..\Libs\ServerSync.dll</HintPath>
     </Reference>
   </ItemGroup>
 
