@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using HarmonyLib;
@@ -19,9 +20,13 @@ public class ModifyLocations
     {
       foreach (var location in ZoneSystem.instance.m_locations)
       {
+        if (location.m_quantity == 0 || !location.m_enable) continue;
         if (location.m_prefabName == Game.instance.m_StartLocation) continue;
         OriginalQuantities[location] = location.m_quantity;
-        location.m_quantity = Mathf.RoundToInt(location.m_quantity * Configuration.LocationsMultiplier);
+        if (Configuration.LocationsMultiplier == 0f)
+          location.m_quantity = 0;
+        else // Some rarer locations might not appear at all if the multiplier is too low, so ensure at least 1.
+          location.m_quantity = Math.Max(1, Mathf.RoundToInt(location.m_quantity * Configuration.LocationsMultiplier));
       }
     }
     if (Configuration.WorldRadius != 10000f)

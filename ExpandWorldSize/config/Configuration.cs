@@ -77,20 +77,13 @@ public partial class Configuration
     configMapSize.SettingChanged += (e, s) =>
     {
       if (!Minimap.instance) return;
-      var newValue = (int)(MinimapAwake.OriginalTextureSize * MapSize);
-      if (newValue == Minimap.instance.m_textureSize) return;
-      Minimap.instance.m_maxZoom = MinimapAwake.OriginalMinZoom * Mathf.Max(1f, MapSize);
-      MapGeneration.UpdateTextureSize(Minimap.instance, newValue);
-      wrapper.Regenerate();
+      if (MinimapAwake.Refresh(Minimap.instance)) wrapper.Regenerate();
     };
-    configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size", 1f, false, "Decreases the minimap detail, but doesn't affect the generation time.");
+    configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size", 0f, false, "Decreases the minimap detail, but doesn't affect the generation time. Automatically calculated when zero.");
     configMapPixelSize.SettingChanged += (e, s) =>
     {
       if (!Minimap.instance) return;
-      var newValue = MinimapAwake.OriginalPixelSize * MapPixelSize;
-      if (newValue == Minimap.instance.m_pixelSize) return;
-      Minimap.instance.m_pixelSize = newValue;
-      wrapper.Regenerate();
+      if (MinimapAwake.Refresh(Minimap.instance)) wrapper.Regenerate();
     };
     configWorldStretch = wrapper.BindFloat(section, "Stretch world", 1f, true, "Stretches the world to a bigger area.");
     configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, true, "Stretches the biomes to a bigger area.");

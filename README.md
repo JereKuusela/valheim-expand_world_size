@@ -28,18 +28,11 @@ Note: 2x world radius means 4x world area. So for 20000 radius you would need 4x
 
 Note: If the game fails to place the spawn altar (for example if no Meadows), then it is forcefully placed at the middle of the map. With bad luck, this can be underwater.
 
-## Minimap
+## World map
 
-The minimap size must be manually changed because there are two different settings. Both of the settings increase the minimap size but have a different drawback. `Minimap size` significantly increases the minimap generation time while `Minimap pixel size` makes the minimap less detailed.
+The map granularity (meters per pixel) automatically scales to match the world size. This can be manually changed by setting the `Minimap pixel size` to a non-zero value (1 is the default granularity), but is not recommended.
 
-The game caches the minimap which helps with the loading times.
-
-Recommended settings:
-
-- 20000 radius: 2 size, 1 pixel.
-- 40000 radius: 2 size, 2 pixel.
-- 80000 radius: 4 size, 2 pixel.
-- 160000 radius: 4 size, 4 pixel.
+The map size itself can be changed with `Minimap size` setting to improve the granularity. However this significantly increases how long it takes to generate the world map.
 
 Example generation times:
 
@@ -49,7 +42,7 @@ Example generation times:
 - 8 size: 16 minutes.
 - 16 size: 1 hour.
 
-Note: Changing `Minimap size` resets explored areas.
+Note: Changing `Minimap size` also resets explored areas.
 
 ## Altitude
 

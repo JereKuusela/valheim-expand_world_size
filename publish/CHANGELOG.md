@@ -1,3 +1,7 @@
+- v1.30
+  - Changes the locations multiplier setting to result in at least 1 location of each type.
+  - Changes the setting "Minimap pixel size" to automatically scale when set to zero (new default value).
+
 - v1.29
   - Fixed for the new update. Thanks Kurios.ZeuS!
   - Updated DotNet from 4.8 to Standard 2.1.
