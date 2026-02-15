@@ -8,6 +8,7 @@ namespace ExpandWorldSize;
 public class EWD
 {
   public const string GUID = "expand_world_data";
+  public static bool IsPresent = false;
   private static Assembly? Assembly;
   private static MethodInfo? SetSize;
   public static void Run()
@@ -19,6 +20,7 @@ public class EWD
     SetSize = AccessTools.Method(type, "Set");
     if (SetSize == null) return;
     Log.Info("\"Expand World Data\" detected. Applying compatibility.");
+    IsPresent = true;
   }
 
   public static void RefreshSize()

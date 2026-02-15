@@ -1,6 +1,7 @@
 - v1.30
   - Changes the locations multiplier setting to result in at least 1 location of each type.
   - Changes the setting "Minimap pixel size" to automatically scale when set to zero (new default value).
+  - Fixes double scaling of location distance requirements when Expand World Data mod was also installed. Thanks Kurios.ZeuS!
 
 - v1.29
   - Fixed for the new update. Thanks Kurios.ZeuS!
@@ -12,10 +13,3 @@
 - v1.27
   - Adds smoother transition to the "Fix water color" setting.
   - Optimizes the "Fix water color" setting.
-
-- v1.26
-  - Adds a setting to remove the red Ashlands water. Thanks Badger!
-  - Adds a setting to dynamically update the water color when entering/exiting Ashlands biome.
-
-- v1.25
-  - Fixed for the new update.
