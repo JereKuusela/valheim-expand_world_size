@@ -29,17 +29,21 @@ public class ModifyLocations
           location.m_quantity = Math.Max(1, Mathf.RoundToInt(location.m_quantity * Configuration.LocationsMultiplier));
       }
     }
-    if (Configuration.WorldRadius != 10000f)
+
+    //correct the double scaling of location distances when using Expand World Data, as it also scales the world radius and thus the location distances
+    var ewd = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("expand_world_data");
+    if (!ewd && Configuration.WorldRadius != 10000f)
     {
-      foreach (var location in ZoneSystem.instance.m_locations)
-      {
-        OriginalMin[location] = location.m_minDistance;
-        OriginalMax[location] = location.m_maxDistance;
-        location.m_minDistance *= Configuration.WorldRadius / 10000f;
-        location.m_maxDistance *= Configuration.WorldRadius / 10000f;
-      }
+        foreach (var location in ZoneSystem.instance.m_locations)
+        {
+            OriginalMin[location] = location.m_minDistance;
+            OriginalMax[location] = location.m_maxDistance;
+            location.m_minDistance *= Configuration.WorldRadius / 10000f;
+            location.m_maxDistance *= Configuration.WorldRadius / 10000f;
+        }
     }
-  }
+
+    }
   static void Postfix(bool show)
   {
     if (show) return;
