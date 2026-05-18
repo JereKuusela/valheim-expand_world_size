@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using HarmonyLib;
@@ -19,26 +20,29 @@ public class ModifyLocations
     {
       foreach (var location in ZoneSystem.instance.m_locations)
       {
+        if (location.m_quantity == 0 || !location.m_enable) continue;
         if (location.m_prefabName == Game.instance.m_StartLocation) continue;
         OriginalQuantities[location] = location.m_quantity;
-        location.m_quantity = Mathf.RoundToInt(location.m_quantity * Configuration.LocationsMultiplier);
+        if (Configuration.LocationsMultiplier == 0f)
+          location.m_quantity = 0;
+        else // Some rarer locations might not appear at all if the multiplier is too low, so ensure at least 1.
+          location.m_quantity = Math.Max(1, Mathf.RoundToInt(location.m_quantity * Configuration.LocationsMultiplier));
       }
     }
 
-    //correct the double scaling of location distances when using Expand World Data, as it also scales the world radius and thus the location distances
-    var ewd = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("expand_world_data");
-    if (!ewd && Configuration.WorldRadius != 10000f)
+    // Expand World Data also scales the location distances, resulting in double scaling if both codes run.
+    if (!EWD.IsPresent && Configuration.WorldRadius != 10000f)
     {
-        foreach (var location in ZoneSystem.instance.m_locations)
-        {
-            OriginalMin[location] = location.m_minDistance;
-            OriginalMax[location] = location.m_maxDistance;
-            location.m_minDistance *= Configuration.WorldRadius / 10000f;
-            location.m_maxDistance *= Configuration.WorldRadius / 10000f;
-        }
+      foreach (var location in ZoneSystem.instance.m_locations)
+      {
+        OriginalMin[location] = location.m_minDistance;
+        OriginalMax[location] = location.m_maxDistance;
+        location.m_minDistance *= Configuration.WorldRadius / 10000f;
+        location.m_maxDistance *= Configuration.WorldRadius / 10000f;
+      }
     }
 
-    }
+  }
   static void Postfix(bool show)
   {
     if (show) return;

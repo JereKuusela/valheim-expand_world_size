@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using HarmonyLib;
 using UnityEngine;
 
@@ -9,15 +10,31 @@ public class MinimapAwake
   // Applies the map parameter changes.
   public static float OriginalPixelSize;
   public static int OriginalTextureSize;
-  public static float OriginalMinZoom;
+  public static float OriginalMaxZoom;
   public static void Postfix(Minimap __instance)
   {
     OriginalTextureSize = __instance.m_textureSize;
-    __instance.m_textureSize = (int)(__instance.m_textureSize * Configuration.MapSize);
-    OriginalMinZoom = __instance.m_maxZoom;
-    __instance.m_maxZoom = Mathf.Max(1f, Configuration.MapSize);
+    OriginalMaxZoom = __instance.m_maxZoom;
     OriginalPixelSize = __instance.m_pixelSize;
-    __instance.m_pixelSize *= Configuration.MapPixelSize;
+    Refresh(__instance);
+  }
+
+  public static bool Refresh(Minimap instance)
+  {
+    var newTextureSize = (int)(OriginalTextureSize * Configuration.MapSize);
+    var newMaxZoom = OriginalMaxZoom * Mathf.Max(1f, Configuration.MapSize);
+    var newPixelSize = CalculatePixelSize();
+    if (instance.m_textureSize == newTextureSize && instance.m_maxZoom == newMaxZoom && instance.m_pixelSize == newPixelSize) return false;
+    MapGeneration.UpdateTextureSize(Minimap.instance, newTextureSize);
+    instance.m_maxZoom = newMaxZoom;
+    instance.m_pixelSize = newPixelSize;
+    return true;
+  }
+  private static float CalculatePixelSize()
+  {
+    if (Configuration.MapPixelSize != 0f) return OriginalPixelSize * Configuration.MapPixelSize;
+    var sizeMultiplier = Configuration.WorldTotalRadius / 10500f;
+    return OriginalPixelSize * sizeMultiplier / Configuration.MapSize;
   }
 }
 
