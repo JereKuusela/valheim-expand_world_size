@@ -71,19 +71,29 @@ public partial class Configuration
   {
     var section = "1. General";
     configRegenerateMap = wrapper.Bind(section, "Regenerate map", true, false, "If true, the world map is regenerated automatically on data changes.");
-    configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, true, "Radius of the world in meters (excluding the edge).");
-    configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500f, true, "Size of the edge area in meters (added to the radius for the total size).");
+    configWorldRadius = wrapper.BindFloat(section, "World radius", 10000f, false, "Radius of the world in meters (excluding the edge).");
+    configWorldRadius.SettingChanged += (e, s) =>
+    {
+      if (Minimap.instance) MinimapAwake.Refresh(Minimap.instance);
+      wrapper.Regenerate();
+    };
+    configWorldEdgeSize = wrapper.BindFloat(section, "World edge size", 500f, false, "Size of the edge area in meters (added to the radius for the total size).");
+    configWorldEdgeSize.SettingChanged += (e, s) =>
+    {
+      if (Minimap.instance) MinimapAwake.Refresh(Minimap.instance);
+      wrapper.Regenerate();
+    };
     configMapSize = wrapper.BindFloat(section, "Minimap size", 1f, false, "Increases the minimap size, but also significantly increases the generation time.");
     configMapSize.SettingChanged += (e, s) =>
     {
       if (!Minimap.instance) return;
-      if (MinimapAwake.Refresh(Minimap.instance)) wrapper.Regenerate();
+      if (MinimapAwake.Refresh(Minimap.instance)) wrapper.RegenerateMap();
     };
     configMapPixelSize = wrapper.BindFloat(section, "Minimap pixel size", 0f, false, "Decreases the minimap detail, but doesn't affect the generation time. Automatically calculated when zero.");
     configMapPixelSize.SettingChanged += (e, s) =>
     {
       if (!Minimap.instance) return;
-      if (MinimapAwake.Refresh(Minimap.instance)) wrapper.Regenerate();
+      if (MinimapAwake.Refresh(Minimap.instance)) wrapper.RegenerateMap();
     };
     configWorldStretch = wrapper.BindFloat(section, "Stretch world", 1f, true, "Stretches the world to a bigger area.");
     configBiomeStretch = wrapper.BindFloat(section, "Stretch biomes", 1f, true, "Stretches the biomes to a bigger area.");

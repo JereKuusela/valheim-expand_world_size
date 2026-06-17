@@ -6,18 +6,13 @@ using ServerSync;
 
 namespace Service;
 
-public class ConfigWrapper
+public class ConfigWrapper(ConfigFile configFile, ConfigSync configSync, Action regenerate, Action regenerateMap)
 {
 
-  private readonly ConfigFile ConfigFile;
-  private readonly ConfigSync ConfigSync;
-  public readonly Action Regenerate;
-  public ConfigWrapper(ConfigFile configFile, ConfigSync configSync, Action regenerate)
-  {
-    ConfigFile = configFile;
-    ConfigSync = configSync;
-    Regenerate = regenerate;
-  }
+  private readonly ConfigFile ConfigFile = configFile;
+  private readonly ConfigSync ConfigSync = configSync;
+  public readonly Action Regenerate = regenerate;
+  public readonly Action RegenerateMap = regenerateMap;
   public static Dictionary<ConfigEntry<string>, float> Floats = [];
   public static Dictionary<ConfigEntry<string>, float?> NullFloats = [];
   public static Dictionary<ConfigEntry<string>, int> Ints = [];

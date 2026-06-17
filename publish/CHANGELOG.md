@@ -1,3 +1,12 @@
+
+- v1.31
+  - Improves compatibility with Better Continents mod. Thanks Kurios.ZeuS!
+  - Improves compatibility with Location Placement Accelerator mod. Thanks Kurios.ZeuS!
+  - Improves minimap generation speed. Thanks Kurios.ZeuS!
+  - Fixes minimap caching not working. Thanks Kurios.ZeuS!
+  - Fixes automatic minimap pixel size not updating when world size was changed.
+  - Fixes map size and map pixel size also triggering world regeneration, now only triggers map generation.
+
 - v1.30
   - Changes the locations multiplier setting to result in at least 1 location of each type.
   - Changes the setting "Minimap pixel size" to automatically scale when set to zero (new default value).

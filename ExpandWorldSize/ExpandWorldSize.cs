@@ -30,7 +30,7 @@ public class EWS : BaseUnityPlugin
   {
     Log.Init(Logger);
     Instance = this;
-    ConfigWrapper wrapper = new(Config, ConfigSync, InvokeRegenerate);
+    ConfigWrapper wrapper = new(Config, ConfigSync, InvokeRegenerate, InvokeRegenerateMap);
     Configuration.Init(wrapper);
     // Two patchers are needed until all patches are properly dynamic.
     Harmony harmony = new(GUID);
@@ -58,6 +58,13 @@ public class EWS : BaseUnityPlugin
     CancelInvoke("Regenerate");
     Invoke("Regenerate", 1.0f);
   }
+  public void InvokeRegenerateMap()
+  {
+    if (Patcher.IsMenu) return;
+    // Debounced for smooth config editing.
+    CancelInvoke("RegenerateMap");
+    Invoke("RegenerateMap", 1.0f);
+  }
   public void LateUpdate()
   {
     if (Patcher.IsMenu) return;
@@ -65,6 +72,7 @@ public class EWS : BaseUnityPlugin
   }
 
   public void Regenerate() => WorldInfo.Generate();
+  public void RegenerateMap() => WorldInfo.Map();
 #pragma warning disable IDE0051
   private void OnDestroy()
   {
