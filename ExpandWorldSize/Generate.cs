@@ -248,6 +248,7 @@ public class MapGeneration
                       var biomeHeight = wg.GetBiomeHeight(biome, wx, wy, out var mask);
                       mapTexture[i * textureSize + j] = map.GetPixelColor(biome);
                       forestMaskTexture[i * textureSize + j] = map.GetMaskColor(wx, wy, biomeHeight, biome);
+                      biomeHeight = EWD.GetMinimapHeight(biomeHeight, biome);
                       heightTexture[i * textureSize + j] = new(biomeHeight, 0f, 0f);
 
                       var num = Mathf.Clamp((int)(biomeHeight * half), 0, 65025);

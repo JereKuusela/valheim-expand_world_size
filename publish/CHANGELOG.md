@@ -1,3 +1,5 @@
+- v1.32
+  - Adds support for minimap color from Expand World Data mod.
 
 - v1.31
   - Improves compatibility with Better Continents mod. Thanks Kurios.ZeuS!
@@ -18,7 +20,3 @@
 
 - v1.28
   - Fixes wrong weather when world stretch is used.
-
-- v1.27
-  - Adds smoother transition to the "Fix water color" setting.
-  - Optimizes the "Fix water color" setting.
