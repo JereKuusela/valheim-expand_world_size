@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HarmonyLib;
@@ -42,43 +43,67 @@ public class PatchTryLoadMinimapTextureData
 
   private static bool TryLoadMinimapTextureData(Minimap obj)
   {
-    if (string.IsNullOrEmpty(obj.m_forestMaskTexturePath) || !File.Exists(obj.m_forestMaskTexturePath) || !File.Exists(obj.m_mapTexturePath) || !File.Exists(obj.m_heightTexturePath) || 37 != ZNet.World.m_worldVersion)
+    if (string.IsNullOrEmpty(obj.m_cachedMinimapMaskTexturePath) || !File.Exists(obj.m_cachedMinimapMaskTexturePath))
+      return false;
+    if (string.IsNullOrEmpty(obj.m_cachedMinimapBiomeTexturePath) || !File.Exists(obj.m_cachedMinimapBiomeTexturePath))
+      return false;
+    if (string.IsNullOrEmpty(obj.m_cachedMinimapHeightTexturePath) || !File.Exists(obj.m_cachedMinimapHeightTexturePath))
+      return false;
+    if (string.IsNullOrEmpty(obj.m_cachedMinimapMetaPath) || !File.Exists(obj.m_cachedMinimapMetaPath))
+      return false;
+    if (ZNet.World.m_worldVersion != Version.World.DeepNorth)
+      return false;
+
+    try
     {
-      return false;
-    }
-    Stopwatch stopwatch = Stopwatch.StartNew();
-    Texture2D texture2D = new Texture2D(obj.m_forestMaskTexture.width, obj.m_forestMaskTexture.height, TextureFormat.ARGB32, false);
-    if (!texture2D.LoadImage(File.ReadAllBytes(obj.m_forestMaskTexturePath)))
-      return false;
-    if (obj.m_forestMaskTexture.width != texture2D.width || obj.m_forestMaskTexture.height != texture2D.height)
-      return false;
-    obj.m_forestMaskTexture.SetPixels(texture2D.GetPixels());
-    obj.m_forestMaskTexture.Apply();
-    if (!texture2D.LoadImage(File.ReadAllBytes(obj.m_mapTexturePath)))
-      return false;
-    if (obj.m_mapTexture.width != texture2D.width || obj.m_mapTexture.height != texture2D.height)
-      return false;
-    obj.m_mapTexture.SetPixels(texture2D.GetPixels());
-    obj.m_mapTexture.Apply();
-    if (!texture2D.LoadImage(File.ReadAllBytes(obj.m_heightTexturePath)))
-      return false;
-    if (obj.m_heightTexture.width != texture2D.width || obj.m_heightTexture.height != texture2D.height)
-      return false;
-    Color[] pixels = texture2D.GetPixels();
-    for (int i = 0; i < obj.m_textureSize; i++)
-    {
-      for (int j = 0; j < obj.m_textureSize; j++)
+      var value = File.ReadAllBytes(obj.m_cachedMinimapMetaPath);
+      if (BitConverter.ToInt32(value, 0) != ZNet.World.m_seed)
       {
-        int num = i * obj.m_textureSize + j;
-        int num2 = (int)(pixels[num].r * 255f);
-        int num3 = (int)(pixels[num].g * 255f);
-        int num4 = (num2 << 8) + num3;
-        float num5 = 127.5f;
-        pixels[num].r = (float)num4 / num5;
+        ZLog.LogWarning("Regenerating minimap: Minimap seed is wrong.");
+        return false;
+      }
+      var cachedMinimap = (Version.CachedMinimap)BitConverter.ToInt32(value, 4);
+      if (cachedMinimap != Version.CachedMinimap.Original)
+      {
+        ZLog.Log($"Regenerating minimap: Minimap version changed from: {cachedMinimap} to {Version.CachedMinimap.Original}.");
+        return false;
       }
     }
-    obj.m_heightTexture.SetPixels(pixels);
-    obj.m_heightTexture.Apply();
+    catch (Exception)
+    {
+      return false;
+    }
+
+    Stopwatch stopwatch = Stopwatch.StartNew();
+    try
+    {
+      var maskBytes = File.ReadAllBytes(obj.m_cachedMinimapMaskTexturePath);
+      var biomeBytes = File.ReadAllBytes(obj.m_cachedMinimapBiomeTexturePath);
+      var heightBytes = File.ReadAllBytes(obj.m_cachedMinimapHeightTexturePath);
+
+      var maskColors = Utils.CompressedBufferToColors(maskBytes);
+      var biomeColors = Utils.CompressedBufferToColors(biomeBytes);
+      var heightColors = Utils.CompressedHalfBufferToRedChannel(heightBytes);
+
+      var expectedLength = obj.m_textureSize * obj.m_textureSize;
+      if (maskColors.Length != expectedLength || biomeColors.Length != expectedLength || heightColors.Length != expectedLength)
+      {
+        ZLog.LogWarning($"Regenerating minimap: Minimap texture size mismatch. Expected length: {expectedLength}, but got maskColors: {maskColors.Length}, biomeColors: {biomeColors.Length}, heightColors: {heightColors.Length}");
+        return false;
+      }
+
+      obj.m_forestMaskTexture.SetPixels32(maskColors);
+      obj.m_forestMaskTexture.Apply();
+      obj.m_mapTexture.SetPixels32(biomeColors);
+      obj.m_mapTexture.Apply();
+      obj.m_heightTexture.SetPixels(heightColors);
+      obj.m_heightTexture.Apply();
+    }
+    catch (Exception ex)
+    {
+      ZLog.LogWarning("Regenerating minimap: Error loading minimap files: " + ex.Message + " Stacktrace: " + ex.StackTrace);
+      return false;
+    }
     ZLog.Log("Loading minimap textures done [" + stopwatch.ElapsedMilliseconds.ToString() + "ms]");
     return true;
   }
@@ -141,8 +166,8 @@ public class MapGeneration
     {
       wrapMode = TextureWrapMode.Clamp
     };
-    map.m_explored = new bool[map.m_textureSize * map.m_textureSize];
-    map.m_exploredOthers = new bool[map.m_textureSize * map.m_textureSize];
+    map.m_explored = new BitArray(map.m_textureSize * map.m_textureSize, false);
+    map.m_exploredOthers = new BitArray(map.m_textureSize * map.m_textureSize, false);
     map.m_mapImageLarge.material.SetTexture("_MainTex", map.m_mapTexture);
     map.m_mapImageLarge.material.SetTexture("_MaskTex", map.m_forestMaskTexture);
     map.m_mapImageLarge.material.SetTexture("_HeightTex", map.m_heightTexture);
@@ -164,16 +189,16 @@ public class MapGeneration
     Minimap.DeleteMapTextureData(ZNet.World.m_name);
 
     int size = map.m_textureSize * map.m_textureSize;
-    var mapTexture = new Color32[size];
-    var forestMaskTexture = new Color32[size];
-    var heightTexture = new Color[size];
-    var cachedTexture = new Color32[size];
+    var biomePixels = new Color32[size];
+    var maskPixels = new Color32[size];
+    var heightPixels = new Color[size];
+    var heightArray = new float[size];
 
     CancellationTokenSource cts = new();
     var ct = cts.Token;
     while (Marketplace.IsLoading())
       yield return null;
-    var task = Generate(map, mapTexture, forestMaskTexture, heightTexture, cachedTexture, ct);
+    var task = Generate(map, biomePixels, maskPixels, heightPixels, heightArray, ct);
     CTS = cts;
     while (!task.IsCompleted)
       yield return null;
@@ -182,17 +207,17 @@ public class MapGeneration
       Log.Error($"Map generation failed!\n{task.Exception}");
     else if (!ct.IsCancellationRequested)
     {
-      map.m_mapTexture.SetPixels32(mapTexture);
+      map.m_mapTexture.SetPixels32(biomePixels);
       yield return null;
       map.m_mapTexture.Apply();
       yield return null;
 
-      map.m_forestMaskTexture.SetPixels32(forestMaskTexture);
+      map.m_forestMaskTexture.SetPixels32(maskPixels);
       yield return null;
       map.m_forestMaskTexture.Apply();
       yield return null;
 
-      map.m_heightTexture.SetPixels(heightTexture);
+      map.m_heightTexture.SetPixels(heightPixels);
       yield return null;
       map.m_heightTexture.Apply();
       yield return null;
@@ -200,12 +225,10 @@ public class MapGeneration
       // So do one "fake" generate call to trigger those.
       DoFakeGenerate = true;
       map.GenerateWorldMap();
-      Texture2D cached = new(map.m_textureSize, map.m_textureSize);
-      cached.SetPixels32(cachedTexture);
-      cached.Apply();
       var workers = Math.Max(1, Environment.ProcessorCount - 2);
       Log.Info($"Map generation finished ({stopwatch.Elapsed.TotalSeconds:F1}s, parallel, {workers} workers).");
-      map.SaveMapTextureDataToDisk(map.m_forestMaskTexture, map.m_mapTexture, cached);
+      if (FileHelpers.LocalStorageSupport == LocalStorageSupport.Supported)
+        map.SaveMapTextureDataToDisk(maskPixels, biomePixels, heightArray);
     }
     stopwatch.Stop();
     cts.Dispose();
@@ -215,18 +238,17 @@ public class MapGeneration
   }
 
   static async Task Generate(
-      Minimap map, Color32[] mapTexture, Color32[] forestMaskTexture, Color[] heightTexture, Color32[] cachedtexture, CancellationToken ct)
+      Minimap map, Color32[] biomePixels, Color32[] maskPixels, Color[] heightPixels, float[] heightArray, CancellationToken ct)
   {
     await Task
         .Run(
           () =>
           {
-            var wg = WorldGenerator.m_instance;
+            var wg = WorldGenerator.instance;
             var textureSize = map.m_textureSize; // default 2048
             var halfTextureSize = textureSize / 2;
             var pixelSize = map.m_pixelSize;   // default 12
             var halfPixelSize = pixelSize / 2f;
-            var half = 127.5f;
 
             // Matches BC and LAP to leave 2 cores for other uses like GUI.
             var workers = Math.Max(1, Environment.ProcessorCount - 2);
@@ -244,17 +266,14 @@ public class MapGeneration
                     {
                       var wx = (j - halfTextureSize) * pixelSize + halfPixelSize;
                       var wy = (i - halfTextureSize) * pixelSize + halfPixelSize;
-                      var biome = wg.GetBiome(wx, wy);
-                      var biomeHeight = wg.GetBiomeHeight(biome, wx, wy, out var mask);
-                      mapTexture[i * textureSize + j] = map.GetPixelColor(biome);
-                      forestMaskTexture[i * textureSize + j] = map.GetMaskColor(wx, wy, biomeHeight, biome);
+                      var biome = wg.GetBiome(wx, wy, 0.02f, false);
+                      var biomeHeight = wg.GetBiomeHeight(biome, wx, wy, out var mask, false, true);
+                      var index = i * textureSize + j;
+                      biomePixels[index] = map.GetPixelColor(biome);
+                      maskPixels[index] = map.GetMaskColor(wx, wy, biomeHeight, biome);
                       biomeHeight = EWD.GetMinimapHeight(biomeHeight, biome);
-                      heightTexture[i * textureSize + j] = new(biomeHeight, 0f, 0f);
-
-                      var num = Mathf.Clamp((int)(biomeHeight * half), 0, 65025);
-                      var r = (byte)(num >> 8);
-                      var g = (byte)(num & 255);
-                      cachedtexture[i * textureSize + j] = new(r, g, 0, byte.MaxValue);
+                      heightPixels[index] = new(biomeHeight, 0f, 0f);
+                      heightArray[index] = biomeHeight;
                     }
                   });
             }

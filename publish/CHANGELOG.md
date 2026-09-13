@@ -1,3 +1,6 @@
+- v1.33
+  - Fixes for the new game update.
+
 - v1.32
   - Adds support for minimap color from Expand World Data mod.
 
@@ -17,6 +20,3 @@
 - v1.29
   - Fixed for the new update. Thanks Kurios.ZeuS!
   - Updated DotNet from 4.8 to Standard 2.1.
-
-- v1.28
-  - Fixes wrong weather when world stretch is used.

@@ -5,9 +5,9 @@ namespace ExpandWorldSize;
 [HarmonyPatch(typeof(Player), nameof(Player.AddKnownBiome))]
 public class StartColorTransition
 {
-  public static void Postfix(Heightmap.Biome biome)
+  public static void Postfix(BiomeSector biome)
   {
-    var isAshlands = biome == Heightmap.Biome.AshLands;
+    var isAshlands = biome.Biome == Heightmap.Biome.AshLands;
     WaterColor.StartTransition(isAshlands);
   }
 }
