@@ -8,7 +8,6 @@ using UnityEngine;
 namespace ExpandWorldSize;
 
 [BepInPlugin(GUID, NAME, VERSION)]
-[BepInIncompatibility("expand_world")]
 public class EWS : BaseUnityPlugin
 {
   public const string GUID = "expand_world_size";
