@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using HarmonyLib;
+using Service;
 using UnityEngine;
 
 namespace ExpandWorldSize;
@@ -16,6 +17,7 @@ public class ModifyLocations
   static void Prefix(bool show)
   {
     if (!show) return;
+    GetRandomPointByBiome.Warned.Clear();
     if (Configuration.LocationsMultiplier != 1f)
     {
       foreach (var location in ZoneSystem.instance.m_locations)
@@ -61,6 +63,25 @@ public class ModifyLocations
   }
 }
 
+[HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.GetRandomPointByBiome))]
+public class GetRandomPointByBiome
+{
+  public static HashSet<Heightmap.Biome> Warned = [];
+  static bool Prefix(AltBiomeWorldData __instance, Heightmap.Biome biome, ref BiomePointCoordinate __result)
+  {
+    if (__instance.Biomes[biome].AllPoints.Count == 0)
+    {
+      if (!Warned.Contains(biome))
+      {
+        Log.Warning($"Biome {biome} doesn't exist in the map!");
+        Warned.Add(biome);
+      }
+      __result = default;
+      return false;
+    }
+    return true;
+  }
+}
 [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GetRandomZone))]
 public class GetRandomZone
 {

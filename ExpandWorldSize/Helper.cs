@@ -5,6 +5,14 @@ namespace ExpandWorldSize;
 
 public static class Helper
 {
+  public static CodeMatcher Replace(CodeMatcher instructions, int value, int newValue)
+  {
+    instructions.MatchForward(false, new CodeMatch(OpCodes.Ldc_I4, value));
+    if (instructions.IsInvalid)
+      return instructions;
+
+    return instructions.SetOperandAndAdvance(newValue);
+  }
   public static CodeMatcher Replace(CodeMatcher instructions, double value, double newValue)
   {
     instructions.MatchForward(false, new CodeMatch(OpCodes.Ldc_R8, value));

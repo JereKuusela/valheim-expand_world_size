@@ -1,3 +1,7 @@
+- v1.34
+  - Adds warning if some biome doesn't exist at all in the map.
+  - Fixes biomes not generating past original world size.
+
 - v1.33
   - Fixes for the new game update.
 
@@ -16,7 +20,3 @@
   - Changes the locations multiplier setting to result in at least 1 location of each type.
   - Changes the setting "Minimap pixel size" to automatically scale when set to zero (new default value).
   - Fixes double scaling of location distance requirements when Expand World Data mod was also installed. Thanks Kurios.ZeuS!
-
-- v1.29
-  - Fixed for the new update. Thanks Kurios.ZeuS!
-  - Updated DotNet from 4.8 to Standard 2.1.

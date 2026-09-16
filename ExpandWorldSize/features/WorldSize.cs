@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine;
@@ -6,6 +7,9 @@ namespace ExpandWorldSize;
 
 public class WorldSizeHelper
 {
+  public static int BiomeMapSize => Mathf.CeilToInt(2048f * Configuration.WorldTotalRadius / 10500f);
+  public static float BiomeMapCenter => BiomeMapSize / 2f;
+
   public static IEnumerable<CodeInstruction> EdgeCheck(IEnumerable<CodeInstruction> instructions)
   {
     // BC owns size-derived IL patches when present; EWS already fed it the radius via SetSize.
@@ -16,6 +20,63 @@ public class WorldSizeHelper
     matcher = Helper.Replace(matcher, 10420f, Configuration.WorldTotalRadius - 80);
     matcher = Helper.Replace(matcher, 10500f, Configuration.WorldTotalRadius);
     return matcher.InstructionEnumeration();
+  }
+}
+
+[HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.MapSpaceToWorldSpace), typeof(float))]
+public class MapSpaceToWorldSpaceSize
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
+    CodeMatcher matcher = new(instructions);
+    matcher = Helper.Replace(matcher, 1024f, WorldSizeHelper.BiomeMapCenter);
+    return matcher.InstructionEnumeration();
+  }
+}
+
+[HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.WorldSpaceToMapSpace), typeof(float))]
+public class WorldSpaceToMapSpaceSize
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
+    CodeMatcher matcher = new(instructions);
+    matcher = Helper.Replace(matcher, 1024f, WorldSizeHelper.BiomeMapCenter);
+    return matcher.InstructionEnumeration();
+  }
+}
+
+[HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.GenerateBiomePoints))]
+public class GenerateBiomePointsSize
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
+    CodeMatcher matcher = new(instructions);
+    matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
+    matcher = Helper.Replace(matcher, 110250000f, Configuration.WorldTotalRadius * Configuration.WorldTotalRadius);
+    matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
+    matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
+    return matcher.InstructionEnumeration();
+  }
+}
+
+[HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.Load))]
+public class LoadBiomePointsSize
+{
+  static bool Prefix(BinaryReader reader, Version.World version, ref AltBiomeWorldData __result)
+  {
+    var size = reader.ReadInt32();
+    if (size == WorldSizeHelper.BiomeMapSize)
+    {
+      reader.BaseStream.Position -= sizeof(int);
+      return true;
+    }
+
+    for (var i = 0; i < size; i++)
+      for (var j = 0; j < size; j++)
+        BiomePoint.Load(reader, version);
+
+    __result = new AltBiomeWorldData(WorldSizeHelper.BiomeMapSize);
+    return false;
   }
 }
 
