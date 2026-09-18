@@ -32,6 +32,7 @@ public class WorldInfo
     Refresh();
     MapGeneration.Cancel();
     WorldGenerator.instance.Pregenerate();
+    AltBiomeWorldData.GenerateBiomePoints(WorldGenerator.instance.m_world);
     foreach (var heightmap in Object.FindObjectsByType<Heightmap>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
     {
       heightmap.m_buildData = null;
