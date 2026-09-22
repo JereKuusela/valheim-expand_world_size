@@ -8,7 +8,7 @@ Install on all clients and on the server (modding [guide](https://youtu.be/L9ljm
 
 ## Configuration
 
-Settings are automatically reloaded (consider using [Configuration manager](https://valheim.thunderstore.io/package/Azumatt/Official_BepInEx_ConfigurationManager/)). This can lead to weird behavior so it's recommended to make a fresh world after you are done configuring.
+Settings are automatically reloaded (consider using [Configuration manager](https://valheim.hexium.gg/mods/Azumatt/Official_BepInEx_ConfigurationManager)). This can lead to weird behavior so it's recommended to make a fresh world after you are done configuring.
 
 Note: Pay extra attention when loading old worlds. Certain configurations can modify the terrain significantly and destroy your buildings.
 
