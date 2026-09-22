@@ -7,8 +7,35 @@ namespace ExpandWorldSize;
 
 public class WorldSizeHelper
 {
-  public static int BiomeMapSize => Mathf.CeilToInt(2048f * Configuration.WorldTotalRadius / 10500f);
+  // Stretch reduces point density (bigger pixel size) while keeping world coverage the same.
+  public static int BiomeMapSize => Mathf.CeilToInt(2048f * Configuration.WorldTotalRadius / 10500f / Configuration.WorldStretch);
   public static float BiomeMapCenter => BiomeMapSize / 2f;
+  public static float BiomeMapPixelSize => 12f * Configuration.WorldStretch;
+  public static float BiomeMapHalfPixel => 6f * Configuration.WorldStretch;
+
+
+  // Increasing world size can trigger index out of bounds. So defensively grow the bioem data arrays.
+  public static void GrowBiomeData()
+  {
+    var data = Patcher.WG?.m_world?.m_biomeData;
+    if (data == null) return;
+    var newSize = BiomeMapSize;
+    if (newSize <= data.Size) return;
+    var heights = new float[newSize, newSize];
+    var biomes = new Heightmap.BiomeIndex[newSize, newSize];
+    var sectors = new BiomeSector[newSize, newSize];
+    for (var i = 0; i < data.Size; i++)
+      for (var j = 0; j < data.Size; j++)
+      {
+        heights[i, j] = data.PointHeights[i, j];
+        biomes[i, j] = data.PointBiomes[i, j];
+        sectors[i, j] = data.PointSectors[i, j];
+      }
+    data.PointHeights = heights;
+    data.PointBiomes = biomes;
+    data.PointSectors = sectors;
+    data.Size = newSize;
+  }
 
   public static IEnumerable<CodeInstruction> EdgeCheck(IEnumerable<CodeInstruction> instructions)
   {
@@ -26,10 +53,13 @@ public class WorldSizeHelper
 [HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.MapSpaceToWorldSpace), typeof(float))]
 public class MapSpaceToWorldSpaceSize
 {
+  // return (x - 1024f) * 12f + 6f;
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 1024f, WorldSizeHelper.BiomeMapCenter);
+    matcher = Helper.Replace(matcher, 12f, WorldSizeHelper.BiomeMapPixelSize);
+    matcher = Helper.Replace(matcher, 6f, WorldSizeHelper.BiomeMapHalfPixel);
     return matcher.InstructionEnumeration();
   }
 }
@@ -37,9 +67,12 @@ public class MapSpaceToWorldSpaceSize
 [HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.WorldSpaceToMapSpace), typeof(float))]
 public class WorldSpaceToMapSpaceSize
 {
+  // return (int)((x - 6f) / 12f + 1024f);
   static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
+    matcher = Helper.Replace(matcher, 6f, WorldSizeHelper.BiomeMapHalfPixel);
+    matcher = Helper.Replace(matcher, 12f, WorldSizeHelper.BiomeMapPixelSize);
     matcher = Helper.Replace(matcher, 1024f, WorldSizeHelper.BiomeMapCenter);
     return matcher.InstructionEnumeration();
   }

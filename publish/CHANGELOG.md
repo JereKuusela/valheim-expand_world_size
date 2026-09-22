@@ -1,3 +1,7 @@
+- v1.38
+  - Fixes world scale not scaling alternative biomes.
+  - Fixes possible index out of bounds when increasing world size while in the world.
+
 - v1.37
   - Fixes only west-south side of the map working past default limits.
 

@@ -61,6 +61,7 @@ public class WorldInfo
       Patcher.WG.maxMarshDistance = VersionSetup.MaxMarshDistance * Configuration.WorldRadius / 10000f / Configuration.WorldStretch;
     EWD.RefreshSize();
     BetterContinents.RefreshSize();
+    WorldSizeHelper.GrowBiomeData();
     Patcher.Patch();
   }
 
