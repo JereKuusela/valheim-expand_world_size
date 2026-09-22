@@ -139,6 +139,24 @@ public class GetBaseHeight
   }
 }
 
+[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeSector), typeof(int), typeof(int), typeof(bool))]
+public class GetBiomeSectorSize
+{
+  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  {
+    // BC owns size-derived IL patches when present; EWS already fed it the radius via SetSize.
+    if (BetterContinents.IsEnabled())
+      return instructions;
+
+    CodeMatcher matcher = new(instructions);
+    matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
+    matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
+    matcher = Helper.Replace(matcher, 2047, WorldSizeHelper.BiomeMapSize - 1);
+    matcher = Helper.Replace(matcher, 2047, WorldSizeHelper.BiomeMapSize - 1);
+    return matcher.InstructionEnumeration();
+  }
+}
+
 [HarmonyPatch(typeof(WaterVolume), nameof(WaterVolume.SetupMaterial))]
 public class SetupMaterial
 {

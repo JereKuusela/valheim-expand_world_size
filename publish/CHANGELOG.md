@@ -1,3 +1,6 @@
+- v1.37
+  - Fixes only west-south side of the map working past default limits.
+
 - v1.36
   - Fixes issue with latest update (whole world no longer Meadows).
 
@@ -10,6 +13,3 @@
 
 - v1.33
   - Fixes for the new game update.
-
-- v1.32
-  - Adds support for minimap color from Expand World Data mod.
