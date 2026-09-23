@@ -31,6 +31,8 @@ public class WorldInfo
     Log.Info("Regenerating the world.");
     WorldGenerator.s_cachedBiomeAreas.Clear();
     WorldGenerator.s_cachedBiomes.Clear();
+    foreach (var altBiome in AltBiomeList.m_altBiomes)
+      altBiome.Sectors.Clear();
     Refresh();
     MapGeneration.Cancel();
     WorldGenerator.instance.Pregenerate();
