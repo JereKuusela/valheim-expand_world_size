@@ -29,6 +29,8 @@ public class WorldInfo
   {
     if (Patcher.IsMenu) return;
     Log.Info("Regenerating the world.");
+    WorldGenerator.s_cachedBiomeAreas.Clear();
+    WorldGenerator.s_cachedBiomes.Clear();
     Refresh();
     MapGeneration.Cancel();
     WorldGenerator.instance.Pregenerate();

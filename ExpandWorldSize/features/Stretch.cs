@@ -167,4 +167,29 @@ public class Stretch
     matcher = Helper.Replace(matcher, 10500f, Configuration.StrechedWorldTotalRadius);
     return matcher.InstructionEnumeration();
   }
+
+  public static void PrefixGenerateAltBiomes()
+  {
+    foreach (var altBiome in AltBiomeList.m_altBiomes)
+    {
+      altBiome.m_minDistanceFromCenter *= Configuration.WorldStretch;
+      altBiome.m_aboveWorldX *= Configuration.WorldStretch;
+      altBiome.m_belowWorldX *= Configuration.WorldStretch;
+      altBiome.m_aboveWorldY *= Configuration.WorldStretch;
+      altBiome.m_belowWorldY *= Configuration.WorldStretch;
+    }
+  }
+  public static void FinalizerGenerateAltBiomes()
+  {
+    foreach (var altBiome in AltBiomeList.m_altBiomes)
+    {
+      altBiome.m_minDistanceFromCenter /= Configuration.WorldStretch;
+      altBiome.m_aboveWorldX /= Configuration.WorldStretch;
+      altBiome.m_belowWorldX /= Configuration.WorldStretch;
+      altBiome.m_aboveWorldY /= Configuration.WorldStretch;
+      altBiome.m_belowWorldY /= Configuration.WorldStretch;
+    }
+  }
 }
+
+

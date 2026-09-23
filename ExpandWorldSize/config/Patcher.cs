@@ -70,6 +70,15 @@ public static class Patcher
     harmony.Unpatch(method, patch);
     if (worldStretch != 1f)
       harmony.Patch(method, prefix: new(patch));
+    method = AccessTools.Method(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.GenerateAltBiomes));
+    var prefix = AccessTools.Method(typeof(Stretch), nameof(Stretch.PrefixGenerateAltBiomes));
+    harmony.Unpatch(method, prefix);
+    var finalizer = AccessTools.Method(typeof(Stretch), nameof(Stretch.FinalizerGenerateAltBiomes));
+    harmony.Unpatch(method, finalizer);
+    if (worldStretch != 1f)
+    {
+      harmony.Patch(method, prefix: new(prefix), finalizer: new(finalizer));
+    }
     PatchAshlandsDeepNorthChecks(harmony, worldStretch);
   }
   private static void PatchAshlandsDeepNorthChecks(Harmony harmony, float worldStretch)
