@@ -1,3 +1,6 @@
+- v1.42
+  - Reupload.
+
 - v1.41
   - Fixes index out of bounds error on smaller than default world size.
   - Fixes possible memory leak when minimap size is changed.
