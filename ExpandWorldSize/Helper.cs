@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using HarmonyLib;
+using Service;
 
 namespace ExpandWorldSize;
 
@@ -9,7 +10,10 @@ public static class Helper
   {
     instructions.MatchForward(false, new CodeMatch(OpCodes.Ldc_I4, value));
     if (instructions.IsInvalid)
+    {
+      Log.Warning($"Failed to find int {value} to replace with {newValue}.");
       return instructions;
+    }
 
     return instructions.SetOperandAndAdvance(newValue);
   }
@@ -18,7 +22,10 @@ public static class Helper
     instructions.MatchForward(false, new CodeMatch(OpCodes.Ldc_R8, value));
     // For example BC patches some of these so needs a guard.
     if (instructions.IsInvalid)
+    {
+      Log.Warning($"Failed to find double {value} to replace with {newValue}.");
       return instructions;
+    }
 
     return instructions.SetOperandAndAdvance(newValue);
   }
@@ -27,7 +34,10 @@ public static class Helper
     instructions.MatchForward(false, new CodeMatch(OpCodes.Ldc_R4, value));
     // For example BC patches some of these so needs a guard.
     if (instructions.IsInvalid)
+    {
+      Log.Warning($"Failed to find float {value} to replace with {newValue}.");
       return instructions;
+    }
 
     return instructions.SetOperandAndAdvance(newValue);
   }

@@ -1,3 +1,8 @@
+- v1.41
+  - Fixes index out of bounds error on smaller than default world size.
+  - Fixes possible memory leak when minimap size is changed.
+  - Optimizes minimap memory usage.
+
 - v1.40
   - Fixes alternative biomes not working at all when editing settings while in the world.
 
@@ -8,9 +13,3 @@
 - v1.38
   - Fixes world scale not scaling alternative biomes.
   - Fixes possible index out of bounds when increasing world size while in the world.
-
-- v1.37
-  - Fixes only west-south side of the map working past default limits.
-
-- v1.36
-  - Fixes issue with latest update (whole world no longer Meadows).

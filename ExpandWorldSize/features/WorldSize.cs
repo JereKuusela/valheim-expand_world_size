@@ -183,8 +183,8 @@ public class GetBiomeSectorSize
 
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
-    matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
     matcher = Helper.Replace(matcher, 2047, WorldSizeHelper.BiomeMapSize - 1);
+    matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
     matcher = Helper.Replace(matcher, 2047, WorldSizeHelper.BiomeMapSize - 1);
     return matcher.InstructionEnumeration();
   }

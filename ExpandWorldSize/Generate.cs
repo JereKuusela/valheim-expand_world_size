@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using Service;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 
 namespace ExpandWorldSize;
@@ -149,32 +150,38 @@ public class MapGeneration
   {
     if (map.m_textureSize == textureSize) return;
     map.m_textureSize = textureSize;
+    // Before Minimap.Start, vanilla creates the textures and material instances itself.
+    if (map.m_mapTexture == null) return;
+    UnityEngine.Object.Destroy(map.m_mapTexture);
+    UnityEngine.Object.Destroy(map.m_forestMaskTexture);
+    UnityEngine.Object.Destroy(map.m_heightTexture);
+    UnityEngine.Object.Destroy(map.m_fogTexture);
     map.m_mapTexture = new(map.m_textureSize, map.m_textureSize, TextureFormat.RGB24, false)
     {
+      name = "_Minimap m_mapTexture",
       wrapMode = TextureWrapMode.Clamp
     };
-    map.m_forestMaskTexture = new(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
+    map.m_forestMaskTexture = map.CreateMapTexture([GraphicsFormat.B4G4R4A4_UNormPack16, GraphicsFormat.R4G4B4A4_UNormPack16], TextureFormat.RGBA32);
+    map.m_forestMaskTexture.name = "_Minimap m_forestMaskTexture";
+    map.m_forestMaskTexture.wrapMode = TextureWrapMode.Clamp;
+    map.m_heightTexture = new(map.m_textureSize, map.m_textureSize, TextureFormat.RHalf, false, true)
     {
+      name = "_Minimap m_heightTexture",
       wrapMode = TextureWrapMode.Clamp
     };
-    map.m_heightTexture = new(map.m_textureSize, map.m_textureSize, TextureFormat.RFloat, false)
-    {
-      wrapMode = TextureWrapMode.Clamp
-    };
-    map.m_fogTexture = new(map.m_textureSize, map.m_textureSize, TextureFormat.RGBA32, false)
-    {
-      wrapMode = TextureWrapMode.Clamp
-    };
+    map.m_fogTexture = map.CreateMapTexture([GraphicsFormat.R8G8_UNorm], TextureFormat.RGBA32);
+    map.m_fogTexture.name = "_Minimap m_fogTexture";
+    map.m_fogTexture.wrapMode = TextureWrapMode.Clamp;
     map.m_explored = new BitArray(map.m_textureSize * map.m_textureSize, false);
     map.m_exploredOthers = new BitArray(map.m_textureSize * map.m_textureSize, false);
-    map.m_mapImageLarge.material.SetTexture("_MainTex", map.m_mapTexture);
-    map.m_mapImageLarge.material.SetTexture("_MaskTex", map.m_forestMaskTexture);
-    map.m_mapImageLarge.material.SetTexture("_HeightTex", map.m_heightTexture);
-    map.m_mapImageLarge.material.SetTexture("_FogTex", map.m_fogTexture);
-    map.m_mapImageSmall.material.SetTexture("_MainTex", map.m_mapTexture);
-    map.m_mapImageSmall.material.SetTexture("_MaskTex", map.m_forestMaskTexture);
-    map.m_mapImageSmall.material.SetTexture("_HeightTex", map.m_heightTexture);
-    map.m_mapImageSmall.material.SetTexture("_FogTex", map.m_fogTexture);
+    map.m_mapLargeShader.SetTexture("_MainTex", map.m_mapTexture);
+    map.m_mapLargeShader.SetTexture("_MaskTex", map.m_forestMaskTexture);
+    map.m_mapLargeShader.SetTexture("_HeightTex", map.m_heightTexture);
+    map.m_mapLargeShader.SetTexture("_FogTex", map.m_fogTexture);
+    map.m_mapSmallShader.SetTexture("_MainTex", map.m_mapTexture);
+    map.m_mapSmallShader.SetTexture("_MaskTex", map.m_forestMaskTexture);
+    map.m_mapSmallShader.SetTexture("_HeightTex", map.m_heightTexture);
+    map.m_mapSmallShader.SetTexture("_FogTex", map.m_fogTexture);
     map.Reset();
   }
   public static bool Generating => CTS != null;
@@ -194,46 +201,51 @@ public class MapGeneration
     var heightArray = new float[size];
 
     CancellationTokenSource cts = new();
-    var ct = cts.Token;
-    while (Marketplace.IsLoading())
-      yield return null;
-    var task = Generate(map, biomePixels, maskPixels, heightPixels, heightArray, ct);
     CTS = cts;
-    while (!task.IsCompleted)
-      yield return null;
-
-    if (task.IsFaulted)
-      Log.Error($"Map generation failed!\n{task.Exception}");
-    else if (!ct.IsCancellationRequested)
+    try
     {
-      map.m_mapTexture.SetPixels32(biomePixels);
-      yield return null;
-      map.m_mapTexture.Apply();
-      yield return null;
+      var ct = cts.Token;
+      while (Marketplace.IsLoading() && !ct.IsCancellationRequested)
+        yield return null;
+      var task = Generate(map, biomePixels, maskPixels, heightPixels, heightArray, ct);
+      while (!task.IsCompleted)
+        yield return null;
 
-      map.m_forestMaskTexture.SetPixels32(maskPixels);
-      yield return null;
-      map.m_forestMaskTexture.Apply();
-      yield return null;
+      if (task.IsFaulted)
+        Log.Error($"Map generation failed!\n{task.Exception}");
+      else if (!ct.IsCancellationRequested)
+      {
+        map.m_mapTexture.SetPixels32(biomePixels);
+        yield return null;
+        map.m_mapTexture.Apply();
+        yield return null;
 
-      map.m_heightTexture.SetPixels(heightPixels);
-      yield return null;
-      map.m_heightTexture.Apply();
-      yield return null;
-      // Some map mods may do stuff after generation which won't work with async.
-      // So do one "fake" generate call to trigger those.
-      DoFakeGenerate = true;
-      map.GenerateWorldMap();
-      var workers = Math.Max(1, Environment.ProcessorCount - 2);
-      Log.Info($"Map generation finished ({stopwatch.Elapsed.TotalSeconds:F1}s, parallel, {workers} workers).");
-      if (FileHelpers.LocalStorageSupport == LocalStorageSupport.Supported)
-        map.SaveMapTextureDataToDisk(maskPixels, biomePixels, heightArray);
+        map.m_forestMaskTexture.SetPixels32(maskPixels);
+        yield return null;
+        map.m_forestMaskTexture.Apply();
+        yield return null;
+
+        map.m_heightTexture.SetPixels(heightPixels);
+        yield return null;
+        map.m_heightTexture.Apply();
+        yield return null;
+        // Some map mods may do stuff after generation which won't work with async.
+        // So do one "fake" generate call to trigger those.
+        DoFakeGenerate = true;
+        map.GenerateWorldMap();
+        var workers = Math.Max(1, Environment.ProcessorCount - 2);
+        Log.Info($"Map generation finished ({stopwatch.Elapsed.TotalSeconds:F1}s, parallel, {workers} workers).");
+        if (FileHelpers.LocalStorageSupport == LocalStorageSupport.Supported)
+          map.SaveMapTextureDataToDisk(maskPixels, biomePixels, heightArray);
+      }
+      stopwatch.Stop();
     }
-    stopwatch.Stop();
-    cts.Dispose();
-
-    if (CTS == cts)
-      CTS = null;
+    finally
+    {
+      cts.Dispose();
+      if (CTS == cts)
+        CTS = null;
+    }
   }
 
   static async Task Generate(

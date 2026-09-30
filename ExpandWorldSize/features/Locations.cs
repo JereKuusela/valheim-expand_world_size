@@ -17,6 +17,8 @@ public class ModifyLocations
   static void Prefix(bool show)
   {
     if (!show) return;
+    // Prevents double scaling if shown again without being hidden.
+    Restore();
     GetRandomPointByBiome.Warned.Clear();
     if (Configuration.LocationsMultiplier != 1f)
     {
@@ -48,6 +50,10 @@ public class ModifyLocations
   static void Postfix(bool show)
   {
     if (show) return;
+    Restore();
+  }
+  private static void Restore()
+  {
     foreach (var location in ZoneSystem.instance.m_locations)
     {
       if (OriginalQuantities.TryGetValue(location, out var quantity))
