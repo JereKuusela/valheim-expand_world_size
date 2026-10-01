@@ -1,3 +1,6 @@
+- v1.43
+  - Adds compatibility with Valheim Performance Optimizations (VPO) for water scaling.
+
 - v1.42
   - Reupload.
 
@@ -12,7 +15,3 @@
 - v1.39
   - Fixes world scale not affecting alternative biome conditions (like distance or x/z coordinates).
   - Fixes biome caches not being cleared when editing settings.
-
-- v1.38
-  - Fixes world scale not scaling alternative biomes.
-  - Fixes possible index out of bounds when increasing world size while in the world.
