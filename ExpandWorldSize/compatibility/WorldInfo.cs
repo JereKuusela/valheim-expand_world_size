@@ -25,16 +25,15 @@ public class WorldInfo
     WaterLevel = waterLevel;
     BaseWaterLevel = Helper.HeightToBaseHeight(WaterLevel);
   }
+
   public static void Generate()
   {
-    if (Patcher.IsMenu) return;
     Log.Info("Regenerating the world.");
     WorldGenerator.s_cachedBiomeAreas.Clear();
     WorldGenerator.s_cachedBiomes.Clear();
     foreach (var altBiome in AltBiomeList.m_altBiomes)
       altBiome.Sectors.Clear();
-    Refresh();
-    MapGeneration.Cancel();
+
     WorldGenerator.instance.Pregenerate();
     AltBiomeWorldData.VerifyBiomeData(WorldGenerator.instance.m_world);
     foreach (var heightmap in Object.FindObjectsByType<Heightmap>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
@@ -46,14 +45,8 @@ public class WorldInfo
     SetupMaterial.Refresh();
     if (EnvMan.instance)
       ScaleGlobalWaterSurface.Refresh(EnvMan.instance);
-    if (Configuration.RegenerateMap) Map();
   }
-  public static void Map()
-  {
-    if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
-      Minimap.instance?.GenerateWorldMap();
-  }
-  public static void Refresh()
+  public static void Patch()
   {
     WorldStretch = Configuration.WorldStretch;
     BiomeStretch = Configuration.BiomeStretch;

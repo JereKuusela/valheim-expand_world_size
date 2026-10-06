@@ -12,7 +12,7 @@ public class EWS : BaseUnityPlugin
 {
   public const string GUID = "expand_world_size";
   public const string NAME = "Expand World Size";
-  public const string VERSION = "1.43";
+  public const string VERSION = "1.44";
 #nullable disable
   public static EWS Instance;
 #nullable enable
@@ -29,12 +29,9 @@ public class EWS : BaseUnityPlugin
   {
     Log.Init(Logger);
     Instance = this;
-    ConfigWrapper wrapper = new(Config, ConfigSync, InvokeRegenerate, InvokeRegenerateMap);
+    ConfigWrapper wrapper = new(Config, ConfigSync);
     Configuration.Init(wrapper);
-    // Two patchers are needed until all patches are properly dynamic.
-    Harmony harmony = new(GUID);
-    Harmony dynamicHarmony = new(GUID + ".dynamic");
-    Patcher.Init(harmony, dynamicHarmony);
+    Patcher.Init(new Harmony(GUID));
     try
     {
       SetupWatcher();
@@ -51,19 +48,10 @@ public class EWS : BaseUnityPlugin
     EWD.Run();
     VPO.Run();
   }
-  public void InvokeRegenerate()
+  public void Debounce()
   {
-    if (Patcher.IsMenu) return;
-    // Debounced for smooth config editing.
-    CancelInvoke("Regenerate");
-    Invoke("Regenerate", 1.0f);
-  }
-  public void InvokeRegenerateMap()
-  {
-    if (Patcher.IsMenu) return;
-    // Debounced for smooth config editing.
-    CancelInvoke("RegenerateMap");
-    Invoke("RegenerateMap", 1.0f);
+    CancelInvoke(nameof(RunPending));
+    Invoke(nameof(RunPending), 1.0f);
   }
   public void LateUpdate()
   {
@@ -71,8 +59,7 @@ public class EWS : BaseUnityPlugin
     WaterColor.Transition(Time.deltaTime);
   }
 
-  public void Regenerate() => WorldInfo.Generate();
-  public void RegenerateMap() => WorldInfo.Map();
+  private void RunPending() => Regenerator.Run();
 #pragma warning disable IDE0051
   private void OnDestroy()
   {

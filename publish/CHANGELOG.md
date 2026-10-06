@@ -1,3 +1,9 @@
+- v1.44
+  - Settings are now saved to the world file. Config is overwritten on load.
+  - Adds support for automatically extending the save system up to 65536 meters radius.
+  - Adds a warning when the world is bigger than the save system supports.
+  - Removes `Regenerate map` setting (map is always regenerated).
+
 - v1.43
   - Adds compatibility with Valheim Performance Optimizations (VPO) for water scaling.
 

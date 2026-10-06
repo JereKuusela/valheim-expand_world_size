@@ -28,6 +28,16 @@ Note: 2x world radius means 4x world area. So for 20000 radius you would need 4x
 
 Note: If the game fails to place the spawn altar (for example if no Meadows), then it is forcefully placed at the middle of the map. With bad luck, this can be underwater.
 
+### Per-world settings and save system
+
+The settings are saved to the world file. When a world is loaded, its settings are applied to the config, so loading different worlds always uses the matching settings. New worlds use whatever is in the config. Worlds without saved settings (created before this feature) keep using the current config, and the settings are saved to the world on the next save. Only non-default values are stored.
+
+Valheim saves the world in chunks of 8x8 zones (512x512 zones in total), which only covers a radius of 16384 meters. Everything beyond is saved to a single chunk which causes massive lag. The save grid is automatically made bigger when needed (up to 2048x2048 zones which is 65536 meters radius). A warning is logged when the world size is past 65536 meters.
+
+The save is automatically converted when the world is loaded and the world size doesn't match the save (both directions). Old chunk files are removed on the next load. Always back up your world first.
+
+Note: Don't load or save a world bigger than 16384 meters without this mod. Objects can end up duplicated.
+
 ## World map
 
 The map granularity (meters per pixel) automatically scales to match the world size. This can be manually changed by setting the `Minimap pixel size` to a non-zero value (1 is the default granularity), but is not recommended.

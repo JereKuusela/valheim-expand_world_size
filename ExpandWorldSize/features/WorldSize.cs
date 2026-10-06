@@ -39,10 +39,6 @@ public class WorldSizeHelper
 
   public static IEnumerable<CodeInstruction> EdgeCheck(IEnumerable<CodeInstruction> instructions)
   {
-    // BC owns size-derived IL patches when present; EWS already fed it the radius via SetSize.
-    if (BetterContinents.IsEnabled())
-      return instructions;
-
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10420f, Configuration.WorldTotalRadius - 80);
     matcher = Helper.Replace(matcher, 10500f, Configuration.WorldTotalRadius);
@@ -50,11 +46,10 @@ public class WorldSizeHelper
   }
 }
 
-[HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.MapSpaceToWorldSpace), typeof(float))]
 public class MapSpaceToWorldSpaceSize
 {
   // return (x - 1024f) * 12f + 6f;
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 1024f, WorldSizeHelper.BiomeMapCenter);
@@ -64,11 +59,10 @@ public class MapSpaceToWorldSpaceSize
   }
 }
 
-[HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.WorldSpaceToMapSpace), typeof(float))]
 public class WorldSpaceToMapSpaceSize
 {
   // return (int)((x - 6f) / 12f + 1024f);
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 6f, WorldSizeHelper.BiomeMapHalfPixel);
@@ -78,10 +72,9 @@ public class WorldSpaceToMapSpaceSize
   }
 }
 
-[HarmonyPatch(typeof(AltBiomeWorldData), nameof(AltBiomeWorldData.GenerateBiomePoints))]
 public class GenerateBiomePointsSize
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
@@ -113,31 +106,17 @@ public class LoadBiomePointsSize
   }
 }
 
-[HarmonyPatch(typeof(Ship), nameof(Ship.ApplyEdgeForce))]
-public class ApplyEdgeForce
-{
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => WorldSizeHelper.EdgeCheck(instructions);
-}
-
 [HarmonyPatch(typeof(Player), nameof(Player.EdgeOfWorldKill))]
-public class EdgeOfWorldKill
+public class EdgeOfWorldKillDungeons
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => WorldSizeHelper.EdgeCheck(instructions);
-
   // Safer to simply skip when in dungeons.
   static bool Prefix(Player __instance) => __instance.transform.position.y < 4000f;
 }
 
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetAshlandsHeight))]
 public class GetAshlandsHeightSize
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    // BC owns size-derived IL patches when present; EWS already fed it the radius via SetSize.
-    if (BetterContinents.IsEnabled())
-      return instructions;
-
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     // Incoming coordinates are stretched, so all limits must be stretched as well.
     matcher = Helper.Replace(matcher, 10150d, (Configuration.WorldTotalRadius + 150f) / Configuration.WorldStretch);
@@ -145,16 +124,10 @@ public class GetAshlandsHeightSize
   }
 }
 
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBaseHeight))]
 public class GetBaseHeight
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    // BC owns size-derived IL patches when present; EWS already fed it the radius via SetSize.
-    if (BetterContinents.IsEnabled())
-      return instructions;
-
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     // Skipping the menu part.
     matcher = matcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.m_offset1))));
@@ -172,15 +145,10 @@ public class GetBaseHeight
   }
 }
 
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeSector), typeof(int), typeof(int), typeof(bool))]
 public class GetBiomeSectorSize
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    // BC owns size-derived IL patches when present; EWS already fed it the radius via SetSize.
-    if (BetterContinents.IsEnabled())
-      return instructions;
-
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 2048, WorldSizeHelper.BiomeMapSize);
     matcher = Helper.Replace(matcher, 2047, WorldSizeHelper.BiomeMapSize - 1);
@@ -226,15 +194,10 @@ public class ScaleGlobalWaterSurface
   public static void Postfix(EnvMan __instance) => Refresh(__instance);
 }
 
-[HarmonyPatch(typeof(EnvMan), nameof(EnvMan.UpdateWind))]
 public class UpdateWind
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    // BC already patches this.
-    if (BetterContinents.IsEnabled())
-      return instructions;
-
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10500f, Configuration.WorldRadius);
     // Removes the subtraction of m_edgeOfWorldWidth (already applied above).
@@ -253,15 +216,10 @@ public class UpdateWind
   }
 }
 
-[HarmonyPatch(typeof(WaterVolume), nameof(WaterVolume.GetWaterSurface))]
 public class GetWaterSurface
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    // BC owns size-derived IL patches when present; EWS already fed it the radius via SetSize.
-    if (BetterContinents.IsEnabled())
-      return instructions;
-
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10500f, Configuration.WorldTotalRadius);
     return matcher.InstructionEnumeration();

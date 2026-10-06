@@ -88,22 +88,18 @@ public class GetRandomPointByBiome
     return true;
   }
 }
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GetRandomZone))]
 public class GetRandomZone
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);
     return matcher.InstructionEnumeration();
   }
 }
-[HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.GenerateLocationsTimeSliced), typeof(ZoneSystem.ZoneLocation), typeof(Stopwatch), typeof(ZPackage))]
-[HarmonyPatch(MethodType.Enumerator)]
 public class GenerateLocations
 {
-  [HarmonyTranspiler]
-  static IEnumerable<CodeInstruction> TranspileMoveNext(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> TranspileMoveNext(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);

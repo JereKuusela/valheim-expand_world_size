@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine;
@@ -6,9 +7,21 @@ using UnityEngine;
 namespace ExpandWorldSize;
 
 
-[HarmonyPatch]
 public class Stretch
 {
+  private static readonly FieldInfo AshlandsMinDistance = AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.ashlandsMinDistance));
+  private static readonly FieldInfo AshlandsYOffset = AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.ashlandsYOffset));
+  private static object? DefaultMinDistance;
+  private static object? DefaultYOffset;
+  // Static fields read by vanilla code, so they must match the transpiled radius (or vanilla in the menu).
+  public static void UpdateAshlandsLimits(bool menu)
+  {
+    DefaultMinDistance ??= AshlandsMinDistance.GetValue(null);
+    DefaultYOffset ??= AshlandsYOffset.GetValue(null);
+    AshlandsMinDistance.SetValue(null, menu ? DefaultMinDistance : 1.2f * Configuration.StrechedWorldRadius);
+    AshlandsYOffset.SetValue(null, menu ? DefaultYOffset : -0.4f * Configuration.StrechedWorldRadius);
+  }
+
   public static IEnumerable<CodeInstruction> StretchIsAshlandsTranspiler(IEnumerable<CodeInstruction> instructions)
   {
     return new CodeMatcher(instructions)
@@ -96,22 +109,14 @@ public class Stretch
       .InsertAndAdvance(new CodeInstruction(OpCodes.Div));
   }
 
-  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiome), typeof(float), typeof(float), typeof(float), typeof(bool))]
-
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     matcher = ReplaceBiome(matcher);
     matcher = ReplaceBiome(matcher);
     matcher = ReplaceBiome(matcher);
     matcher = ReplaceBiome(matcher);
     matcher = new(matcher.InstructionEnumeration());
-
-    var field = AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.ashlandsMinDistance));
-    field.SetValue(null, 1.2f * Configuration.StrechedWorldRadius);
-    field = AccessTools.Field(typeof(WorldGenerator), nameof(WorldGenerator.ashlandsYOffset));
-    field.SetValue(null, -0.4f * Configuration.StrechedWorldRadius);
 
     matcher = Helper.Replace(matcher, 2000f, 0.2f * Configuration.StrechedWorldRadius);
     matcher = Helper.Replace(matcher, 6000d, 0.6 * Configuration.StrechedWorldRadius);
@@ -125,44 +130,31 @@ public class Stretch
   }
 
 
-  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.IsDeepnorth)), HarmonyTranspiler]
-
-  static IEnumerable<CodeInstruction> TranspilerIsDeepnorth(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> TranspilerIsDeepnorth(IEnumerable<CodeInstruction> instructions)
   {
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 4000d, 0.4 * Configuration.StrechedWorldRadius);
     matcher = Helper.Replace(matcher, 12000d, 1.2 * Configuration.StrechedWorldRadius);
     return matcher.InstructionEnumeration();
   }
 
-  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.CreateAshlandsGap)), HarmonyTranspiler]
-  static IEnumerable<CodeInstruction> TranspilerCreateAshlandsGap(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> TranspilerCreateAshlandsGap(IEnumerable<CodeInstruction> instructions)
   {
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 400d, 0.04 * Configuration.StrechedWorldRadius);
     return matcher.InstructionEnumeration();
   }
 
-  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.CreateDeepNorthGap)), HarmonyTranspiler]
-  static IEnumerable<CodeInstruction> TranspilerCreateDeepNorthGap(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> TranspilerCreateDeepNorthGap(IEnumerable<CodeInstruction> instructions)
   {
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 4000f, 0.4f * Configuration.StrechedWorldRadius);
     matcher = Helper.Replace(matcher, 12000d, 1.2f * Configuration.StrechedWorldRadius);
     matcher = Helper.Replace(matcher, 400d, 0.04 * Configuration.StrechedWorldRadius);
     return matcher.InstructionEnumeration();
   }
-  [HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.GetBiomeHeight)), HarmonyTranspiler]
-  static IEnumerable<CodeInstruction> TranspilerGetBiomeHeight(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> TranspilerGetBiomeHeight(IEnumerable<CodeInstruction> instructions)
   {
-    // BC already patches this.
-    if (BetterContinents.IsEnabled())
-      return instructions;
-
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, 10500f, Configuration.StrechedWorldTotalRadius);
     return matcher.InstructionEnumeration();

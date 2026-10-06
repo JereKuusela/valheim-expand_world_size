@@ -21,10 +21,9 @@ public class VPO
       return;
     }
     Log.Info("\"Valheim Performance Optimizations\" detected. Applying compatibility.");
-    // Separate instance so that Patcher.Patch (UnpatchSelf) doesn't remove this.
     try
     {
-      new Harmony(EWS.GUID + ".vpo").Patch(method, transpiler: new(AccessTools.Method(typeof(VPO), nameof(Transpiler))));
+      Patcher.Harmony.Patch(method, transpiler: new(AccessTools.Method(typeof(VPO), nameof(Transpiler))));
     }
     catch (System.Exception e)
     {

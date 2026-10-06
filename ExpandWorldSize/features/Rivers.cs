@@ -3,12 +3,10 @@ using System.Reflection.Emit;
 using HarmonyLib;
 namespace ExpandWorldSize;
 
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.FindLakes))]
 public class FindLakes
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     // Looped coordinates are NOT streched, so limits must NOT be streched.
     matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
@@ -23,12 +21,10 @@ public class FindLakes
   }
 }
 
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.IsRiverAllowed))]
 public class IsRiverAllowed
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     // Coordinates are NOT streched, so they must be streched for GetBaseHeight.
     matcher = Stretch.Replace(matcher, OpCodes.Ldfld);
@@ -37,12 +33,10 @@ public class IsRiverAllowed
   }
 }
 
-[HarmonyPatch(typeof(WorldGenerator), nameof(WorldGenerator.FindStreamStartPoint))]
 public class FindStreamStartPoint
 {
-  static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+  public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
   {
-    if (Patcher.IsMenu) return instructions;
     CodeMatcher matcher = new(instructions);
     matcher = Helper.Replace(matcher, -10000f, -Configuration.WorldRadius);
     matcher = Helper.Replace(matcher, 10000f, Configuration.WorldRadius);

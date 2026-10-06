@@ -74,7 +74,7 @@ public class WaterColor
     var shallowColor = Color.Lerp(WaterShallow, AshlandsShallow, TransitionProgress);
     UpdateColors(mat, surfaceColor, topColor, bottomColor, shallowColor);
   }
-  public static void Regenerate()
+  public static void Refresh()
   {
     if (Player.m_localPlayer)
       StartTransition(Player.m_localPlayer.GetCurrentBiome() == Heightmap.Biome.AshLands);
