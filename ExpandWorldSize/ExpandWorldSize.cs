@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using BepInEx;
+using Common;
 using HarmonyLib;
 using Service;
 using UnityEngine;
@@ -29,6 +30,7 @@ public class EWS : BaseUnityPlugin
   {
     Log.Init(Logger);
     Instance = this;
+    RegisterRefresh();
     ConfigWrapper wrapper = new(Config, ConfigSync);
     Configuration.Init(wrapper);
     Patcher.Init(new Harmony(GUID));
@@ -48,18 +50,24 @@ public class EWS : BaseUnityPlugin
     EWD.Run();
     VPO.Run();
   }
-  public void Debounce()
-  {
-    CancelInvoke(nameof(RunPending));
-    Invoke(nameof(RunPending), 1.0f);
-  }
   public void LateUpdate()
   {
+    Refresh.Tick(Time.deltaTime);
     if (Patcher.IsMenu) return;
     WaterColor.Transition(Time.deltaTime);
   }
 
-  private void RunPending() => Regenerator.Run();
+  private static void RegisterRefresh()
+  {
+    Refresh.Register(Regen.Seed, WorldInfo.RefreshSeed);
+    Refresh.Register(Regen.Patches, WorldInfo.Patch);
+    Refresh.Register(Regen.ZoneGrid, ZoneGrid.Refresh);
+    Refresh.Register(Regen.Water, WaterColor.Refresh);
+    Refresh.Register(Regen.Water, SetupMaterial.Refresh);
+    Refresh.Register(Regen.Water, () => { if (EnvMan.instance) ScaleGlobalWaterSurface.Refresh(EnvMan.instance); });
+    Refresh.Register(Regen.Minimap, MapGeneration.Cancel);
+    Refresh.Register(Regen.Minimap, () => { if (Minimap.instance) MinimapAwake.Refresh(Minimap.instance); });
+  }
 #pragma warning disable IDE0051
   private void OnDestroy()
   {

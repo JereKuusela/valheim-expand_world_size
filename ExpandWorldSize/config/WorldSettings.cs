@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using BepInEx.Configuration;
+using Common;
 using HarmonyLib;
 using Service;
 
@@ -56,21 +57,13 @@ public static class WorldSettings
   public static void Apply(World world)
   {
     if (!Stored.TryGetValue(world, out var values)) return;
-    Regenerator.Automatic = false;
-    try
+    foreach (var entry in ConfigWrapper.Entries)
     {
-      foreach (var entry in ConfigWrapper.Entries)
-      {
-        var value = values.TryGetValue(KeyOf(entry), out var stored) ? stored : DefaultOf(entry);
-        if (entry.GetSerializedValue() != value) entry.SetSerializedValue(value);
-      }
-      Regenerator.Request(Regen.Patches);
+      var value = values.TryGetValue(KeyOf(entry), out var stored) ? stored : DefaultOf(entry);
+      if (entry.GetSerializedValue() != value) entry.SetSerializedValue(value);
     }
-    finally
-    {
-      Regenerator.Automatic = true;
-    }
-    Regenerator.Run();
+    // The world load applies patches and generates with the loaded values.
+    Refresh.Clear();
   }
 
   // Grid width of the chunks that are on the disk. Unlisted means the vanilla layout.

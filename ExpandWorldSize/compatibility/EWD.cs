@@ -1,5 +1,6 @@
 using System.Reflection;
 using BepInEx.Bootstrap;
+using Common;
 using HarmonyLib;
 using Service;
 
@@ -18,6 +19,7 @@ public class EWD
     Assembly = info.Instance.GetType().Assembly;
     AccessSetSize(Assembly);
     AccessGetMinimapHeight(Assembly);
+    Refresh.Forward(Assembly);
     Log.Info("\"Expand World Data\" detected. Applying compatibility.");
     IsPresent = true;
   }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Common;
 using HarmonyLib;
 
 namespace ExpandWorldSize;
@@ -10,7 +11,7 @@ public class DebugCommands
   {
     new Terminal.ConsoleCommand("ew_map", "Refreshes the world map.", (args) =>
     {
-      Regenerator.Request(Regen.Minimap);
+      Refresh.Request(Regen.Minimap);
     }, true);
     new Terminal.ConsoleCommand("ew_seeds", "- Prints different seeds.", args =>
     {

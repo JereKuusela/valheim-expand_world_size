@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using BepInEx.Configuration;
-using ExpandWorldSize;
+using Common;
 using ServerSync;
 
 namespace Service;
@@ -46,7 +46,7 @@ public class ConfigWrapper(ConfigFile configFile, ConfigSync configSync)
   public ConfigEntry<T> Bind<T>(string group, string name, T value, Regen regenerate, string description = "", bool synchronizedSetting = true) => Bind(group, name, value, regenerate, new ConfigDescription(description), synchronizedSetting);
   private static void AddRegenerate<T>(ConfigEntry<T> entry, Regen regenerate)
   {
-    if (regenerate != Regen.None) entry.SettingChanged += (e, s) => Regenerator.Request(regenerate);
+    if (regenerate != Regen.None) entry.SettingChanged += (e, s) => Refresh.Request(regenerate);
   }
 
   private static float? TryParseFloat(string value)

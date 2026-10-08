@@ -1,7 +1,5 @@
+using System.Runtime.CompilerServices;
 using HarmonyLib;
-using Service;
-using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace ExpandWorldSize;
 
@@ -26,25 +24,36 @@ public class WorldInfo
     BaseWaterLevel = Helper.HeightToBaseHeight(WaterLevel);
   }
 
-  public static void Generate()
-  {
-    Log.Info("Regenerating the world.");
-    WorldGenerator.s_cachedBiomeAreas.Clear();
-    WorldGenerator.s_cachedBiomes.Clear();
-    foreach (var altBiome in AltBiomeList.m_altBiomes)
-      altBiome.Sectors.Clear();
+  // Seed of the world file, so that clearing the setting can restore it.
+  private sealed record OriginalSeed(string Name, int Seed);
+  private static readonly ConditionalWeakTable<World, OriginalSeed> OriginalSeeds = new();
 
-    WorldGenerator.instance.Pregenerate();
-    AltBiomeWorldData.VerifyBiomeData(WorldGenerator.instance.m_world);
-    foreach (var heightmap in Object.FindObjectsByType<Heightmap>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
-    {
-      heightmap.m_buildData = null;
-      heightmap.Regenerate();
-    }
-    ClutterSystem.instance?.ClearAll();
-    SetupMaterial.Refresh();
-    if (EnvMan.instance)
-      ScaleGlobalWaterSurface.Refresh(EnvMan.instance);
+  public static void StoreSeed(World world)
+  {
+    if (world.m_menu) return;
+    OriginalSeeds.AddOrUpdate(world, new(world.m_seedName, world.m_seed));
+    if (Configuration.Seed != "") ApplySeed(world, Configuration.Seed, Configuration.Seed.GetStableHashCode());
+  }
+
+  private static void ApplySeed(World world, string name, int seed)
+  {
+    world.m_seedName = name;
+    world.m_seed = seed;
+  }
+
+  public static void RefreshSeed()
+  {
+    var generator = WorldGenerator.instance;
+    if (generator == null) return;
+    var world = generator.m_world;
+    if (world.m_menu) return;
+    if (Configuration.Seed != "") ApplySeed(world, Configuration.Seed, Configuration.Seed.GetStableHashCode());
+    else if (OriginalSeeds.TryGetValue(world, out var original)) ApplySeed(world, original.Name, original.Seed);
+    else return;
+    // Prevents default generate (Biomes step generates).
+    world.m_menu = true;
+    try { WorldGenerator.Initialize(world); }
+    finally { world.m_menu = false; }
   }
   public static void Patch()
   {
@@ -83,11 +92,7 @@ public class LoadWorld
 {
   static World Postfix(World result)
   {
-    if (Configuration.Seed != "" && !result.m_menu)
-    {
-      result.m_seedName = Configuration.Seed;
-      result.m_seed = Configuration.Seed.GetStableHashCode();
-    }
+    WorldInfo.StoreSeed(result);
     return result;
   }
 }
